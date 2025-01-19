@@ -5,15 +5,14 @@ use axum::{
     routing::{get, patch},
     Json, Router,
 };
-use uuid::Uuid;
 
 use crate::{
     models::models_todos::{CreateTodo, Pagination, Todo, UpdateTodo},
     utils::db::Db,
 };
 
-// * curl -X POST http://localhost:3000/todos -H "Content-Type: application/json"  -d '{"text": "Buy groceries"}'
-// * curl -X PATCH http://localhost:3000/todos/1 -H "Content-Type: application/json"  -d '{"text": "Buy groceries", "completed": true}'
+// * curl -X POST http://localhost:3000/todos -H "Content-Type: application/json" -d '{"text": "Buy groceries"}'
+// * curl -X PATCH http://localhost:3000/todos/1 -H "Content-Type: application/json" -d '{"text": "Buy more groceries"}'
 // * curl -X DELETE http://localhost:3000/todos/1
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
@@ -51,19 +50,22 @@ pub async fn todos_create(
     State(db): State<Db>,
     Json(input): Json<CreateTodo>,
 ) -> impl IntoResponse {
+    let mut todos = db.write().unwrap();
+    let id = todos.len() as i32 + 1;
+
     let todo = Todo {
-        id: Uuid::new_v4(),
+        id,
         text: input.text,
         completed: false,
     };
 
-    db.write().unwrap().insert(todo.id, todo.clone());
+    todos.insert(todo.id, todo.clone());
 
     (StatusCode::CREATED, Json(todo))
 }
 
 pub async fn todos_update(
-    Path(id): Path<Uuid>,
+    Path(id): Path<i32>,
     State(db): State<Db>,
     Json(input): Json<UpdateTodo>,
 ) -> Result<impl IntoResponse, StatusCode> {
@@ -87,7 +89,7 @@ pub async fn todos_update(
     Ok(Json(todo))
 }
 
-pub async fn todos_delete(Path(id): Path<Uuid>, State(db): State<Db>) -> impl IntoResponse {
+pub async fn todos_delete(Path(id): Path<i32>, State(db): State<Db>) -> impl IntoResponse {
     if db.write().unwrap().remove(&id).is_some() {
         StatusCode::NO_CONTENT
     } else {

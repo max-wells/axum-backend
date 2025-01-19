@@ -1,9 +1,8 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct Todo {
-    pub id: Uuid,
+    pub id: i32,
     pub text: String,
     pub completed: bool,
 }

@@ -1,10 +1,12 @@
 use axum::{error_handling::HandleErrorLayer, http::StatusCode, Router};
+use constants::others::PORT_3000;
 use std::time::Duration;
 use tower::{BoxError, ServiceBuilder};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use utils::db::Db;
 
+mod constants;
 mod models;
 mod services;
 mod utils;
@@ -50,9 +52,7 @@ async fn main() {
         )
         .with_state(db);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(PORT_3000).await.unwrap();
     tracing::debug!("listening on {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
 }
