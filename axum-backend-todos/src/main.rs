@@ -1,9 +1,9 @@
-use axum::{error_handling::HandleErrorLayer, http::StatusCode, Router};
+use axum::{error_handling::HandleErrorLayer, Router};
 use constants::others::PORT_3000;
 use std::time::Duration;
-use tower::{BoxError, ServiceBuilder};
+use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
-use utils::{db::Db, setup_tracing::setup_tracing};
+use utils::{db::Db, handle_timeout_error::handle_timeout_error, setup_tracing::setup_tracing};
 
 mod constants;
 mod models;
@@ -28,16 +28,7 @@ async fn main() {
         // Add middleware to all routes
         .layer(
             ServiceBuilder::new()
-                .layer(HandleErrorLayer::new(|error: BoxError| async move {
-                    if error.is::<tower::timeout::error::Elapsed>() {
-                        Ok(StatusCode::REQUEST_TIMEOUT)
-                    } else {
-                        Err((
-                            StatusCode::INTERNAL_SERVER_ERROR,
-                            format!("Unhandled internal error: {error}"),
-                        ))
-                    }
-                }))
+                .layer(HandleErrorLayer::new(handle_timeout_error))
                 .timeout(Duration::from_secs(10))
                 .layer(TraceLayer::new_for_http())
                 .into_inner(),
