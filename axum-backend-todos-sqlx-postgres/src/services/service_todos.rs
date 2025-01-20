@@ -30,7 +30,7 @@ pub fn service_todos() -> Router<Db> {
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 pub async fn todos_index(State(pool): State<Db>) -> Result<impl IntoResponse, StatusCode> {
-    let todos = sqlx::query_as::<_, Todo>("SELECT * FROM todos ORDER BY created_at DESC")
+    let todos = sqlx::query_as!(Todo, "SELECT * FROM todos ORDER BY created_at DESC")
         .fetch_all(&pool)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -46,11 +46,14 @@ pub async fn todos_create(
     State(pool): State<Db>,
     Json(input): Json<CreateTodo>,
 ) -> Result<impl IntoResponse, StatusCode> {
-    let todo = sqlx::query_as::<_, Todo>("INSERT INTO todos (text) VALUES ($1) RETURNING *")
-        .bind(input.text)
-        .fetch_one(&pool)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let todo = sqlx::query_as!(
+        Todo,
+        "INSERT INTO todos (text) VALUES ($1) RETURNING id, text, created_at, updated_at",
+        input.text
+    )
+    .fetch_one(&pool)
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     Ok((StatusCode::CREATED, Json(todo)))
 }
@@ -61,11 +64,12 @@ pub async fn todos_update(
     Json(input): Json<UpdateTodo>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ApiError>)> {
     if let Some(text) = input.text {
-        let todo = sqlx::query_as::<_, Todo>(
+        let todo = sqlx::query_as!(
+            Todo,
             "UPDATE todos SET text = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
+            text,
+            id
         )
-        .bind(text)
-        .bind(id)
         .fetch_one(&pool)
         .await
         .map_err(|err| {
@@ -101,8 +105,7 @@ pub async fn todos_delete(
     Path(id): Path<i32>,
     State(pool): State<Db>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ApiError>)> {
-    let result = sqlx::query("DELETE FROM todos WHERE id = $1")
-        .bind(id)
+    let result = sqlx::query!("DELETE FROM todos WHERE id = $1", id)
         .execute(&pool)
         .await
         .map_err(|_| {
