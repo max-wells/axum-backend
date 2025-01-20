@@ -30,10 +30,16 @@ pub fn service_todos() -> Router<AppState> {
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 pub async fn todos_index(app_state: State<AppState>) -> Result<impl IntoResponse, StatusCode> {
-    let todos = sqlx::query_as!(Todo, "SELECT * FROM todos ORDER BY created_at DESC")
-        .fetch_all(&app_state.db)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let todos = sqlx::query_as!(
+        Todo,
+        r#"
+            SELECT * FROM todos 
+            ORDER BY created_at DESC
+        "#
+    )
+    .fetch_all(&app_state.db)
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     Ok(Json(todos))
 }
@@ -48,7 +54,11 @@ pub async fn todos_create(
 ) -> Result<impl IntoResponse, StatusCode> {
     let todo = sqlx::query_as!(
         Todo,
-        "INSERT INTO todos (text) VALUES ($1) RETURNING id, text, created_at, updated_at",
+        r#"
+            INSERT INTO todos (text) 
+            VALUES ($1) 
+            RETURNING id, text, created_at, updated_at
+        "#,
         body.text
     )
     .fetch_one(&app_state.db)
@@ -62,42 +72,41 @@ pub async fn todos_update(
     Path(id): Path<i32>,
     app_state: State<AppState>,
     Json(body): Json<UpdateTodo>,
-) -> Result<impl IntoResponse, (StatusCode, Json<ApiError>)> {
-    if let Some(text) = body.text {
-        let todo = sqlx::query_as!(
-            Todo,
-            "UPDATE todos SET text = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
-            text,
-            id
-        )
-        .fetch_one(&app_state.db)
-        .await
-        .map_err(|err| {
-            if err.to_string().contains("no rows") {
-                (
-                    StatusCode::NOT_FOUND,
-                    Json(ApiError {
-                        error: format!("Todo with id {} not found", id),
-                    }),
-                )
-            } else {
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    Json(ApiError {
-                        error: "Internal server error".to_string(),
-                    }),
-                )
-            }
-        })?;
+) -> impl IntoResponse {
+    let result = sqlx::query_as!(
+        Todo,
+        r#"
+            UPDATE todos
+            SET text = COALESCE($1, text),
+                updated_at = NOW()
+            WHERE id = $2
+            RETURNING *
+        "#,
+        body.text,
+        id
+    )
+    .fetch_one(&app_state.db)
+    .await;
 
-        Ok(Json(todo))
-    } else {
-        Err((
-            StatusCode::BAD_REQUEST,
+    match result {
+        Ok(todo) => Json(todo).into_response(),
+        Err(sqlx::Error::RowNotFound) => (
+            StatusCode::NOT_FOUND,
             Json(ApiError {
-                error: "Text field is required".to_string(),
+                error: format!("Todo with id {} not found", id),
             }),
-        ))
+        )
+            .into_response(),
+        Err(e) => {
+            eprintln!("Failed to update todo: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiError {
+                    error: format!("Failed to update todo: {}", e),
+                }),
+            )
+                .into_response()
+        }
     }
 }
 
@@ -105,17 +114,23 @@ pub async fn todos_delete(
     Path(id): Path<i32>,
     app_state: State<AppState>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ApiError>)> {
-    let result = sqlx::query!("DELETE FROM todos WHERE id = $1", id)
-        .execute(&app_state.db)
-        .await
-        .map_err(|_| {
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(ApiError {
-                    error: "Internal server error".to_string(),
-                }),
-            )
-        })?;
+    let result = sqlx::query!(
+        r#"
+            DELETE FROM todos 
+            WHERE id = $1
+        "#,
+        id
+    )
+    .execute(&app_state.db)
+    .await
+    .map_err(|_| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ApiError {
+                error: "Internal server error".to_string(),
+            }),
+        )
+    })?;
 
     if result.rows_affected() == 0 {
         return Err((
