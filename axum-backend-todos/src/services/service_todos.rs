@@ -56,7 +56,6 @@ pub async fn todos_create(
     let todo = Todo {
         id,
         text: input.text,
-        completed: false,
     };
 
     todos.insert(todo.id, todo.clone());
@@ -78,10 +77,6 @@ pub async fn todos_update(
 
     if let Some(text) = input.text {
         todo.text = text;
-    }
-
-    if let Some(completed) = input.completed {
-        todo.completed = completed;
     }
 
     db.write().unwrap().insert(todo.id, todo.clone());

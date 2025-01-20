@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 pub struct Todo {
     pub id: i32,
     pub text: String,
-    pub completed: bool,
 }
 
 // The query parameters for todos index
@@ -22,5 +21,4 @@ pub struct CreateTodo {
 #[derive(Debug, Deserialize)]
 pub struct UpdateTodo {
     pub text: Option<String>,
-    pub completed: Option<bool>,
 }
