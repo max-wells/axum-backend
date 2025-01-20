@@ -1,5 +1,5 @@
 use axum::{
-    extract::{Path, Query, State},
+    extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
     routing::{get, patch},
@@ -7,7 +7,7 @@ use axum::{
 };
 
 use crate::{
-    models::models_todos::{CreateTodo, Pagination, Todo, UpdateTodo},
+    models::models_todos::{CreateTodo, Todo, UpdateTodo},
     utils::db::Db,
 };
 
@@ -29,18 +29,11 @@ pub fn service_todos() -> Router<Db> {
 /*                     ✨ FUNCTIONS ✨                        */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-pub async fn todos_index(
-    pagination: Query<Pagination>,
-    State(pool): State<Db>,
-) -> Result<impl IntoResponse, StatusCode> {
-    let todos = sqlx::query_as::<_, Todo>(
-        "SELECT * FROM todos ORDER BY created_at DESC LIMIT $1 OFFSET $2",
-    )
-    .bind(pagination.limit.unwrap_or(10) as i64)
-    .bind(pagination.offset.unwrap_or(0) as i64)
-    .fetch_all(&pool)
-    .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+pub async fn todos_index(State(pool): State<Db>) -> Result<impl IntoResponse, StatusCode> {
+    let todos = sqlx::query_as::<_, Todo>("SELECT * FROM todos ORDER BY created_at DESC")
+        .fetch_all(&pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     Ok(Json(todos))
 }
