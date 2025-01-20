@@ -19,3 +19,8 @@ pub struct CreateTodo {
 pub struct UpdateTodo {
     pub text: Option<String>,
 }
+
+#[derive(Debug, Serialize)]
+pub struct ApiError {
+    pub error: String,
+}

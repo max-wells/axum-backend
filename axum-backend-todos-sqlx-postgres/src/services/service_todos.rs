@@ -7,7 +7,7 @@ use axum::{
 };
 
 use crate::{
-    models::models_todos::{CreateTodo, Todo, UpdateTodo},
+    models::models_todos::{ApiError, CreateTodo, Todo, UpdateTodo},
     utils::db::Db,
 };
 
@@ -59,7 +59,7 @@ pub async fn todos_update(
     Path(id): Path<i32>,
     State(pool): State<Db>,
     Json(input): Json<UpdateTodo>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiError>)> {
     if let Some(text) = input.text {
         let todo = sqlx::query_as::<_, Todo>(
             "UPDATE todos SET text = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
@@ -68,23 +68,60 @@ pub async fn todos_update(
         .bind(id)
         .fetch_one(&pool)
         .await
-        .map_err(|_| StatusCode::NOT_FOUND)?;
+        .map_err(|err| {
+            if err.to_string().contains("no rows") {
+                (
+                    StatusCode::NOT_FOUND,
+                    Json(ApiError {
+                        error: format!("Todo with id {} not found", id),
+                    }),
+                )
+            } else {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(ApiError {
+                        error: "Internal server error".to_string(),
+                    }),
+                )
+            }
+        })?;
 
         Ok(Json(todo))
     } else {
-        Err(StatusCode::BAD_REQUEST)
+        Err((
+            StatusCode::BAD_REQUEST,
+            Json(ApiError {
+                error: "Text field is required".to_string(),
+            }),
+        ))
     }
 }
 
 pub async fn todos_delete(
     Path(id): Path<i32>,
     State(pool): State<Db>,
-) -> Result<impl IntoResponse, StatusCode> {
-    sqlx::query("DELETE FROM todos WHERE id = $1")
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiError>)> {
+    let result = sqlx::query("DELETE FROM todos WHERE id = $1")
         .bind(id)
         .execute(&pool)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|_| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiError {
+                    error: "Internal server error".to_string(),
+                }),
+            )
+        })?;
+
+    if result.rows_affected() == 0 {
+        return Err((
+            StatusCode::NOT_FOUND,
+            Json(ApiError {
+                error: format!("Todo with id {} not found", id),
+            }),
+        ));
+    }
 
     Ok(StatusCode::NO_CONTENT)
 }
