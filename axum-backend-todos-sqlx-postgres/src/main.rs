@@ -4,7 +4,9 @@ use std::time::Duration;
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
 use utils::{
-    db::create_db_pool, handle_timeout_error::handle_timeout_error, setup_tracing::setup_tracing,
+    db::{create_db_pool, AppState},
+    handle_timeout_error::handle_timeout_error,
+    setup_tracing::setup_tracing,
 };
 
 mod constants;
@@ -32,6 +34,8 @@ async fn main() {
         .await
         .expect("Failed to create database pool");
 
+    let app_state = AppState { db: pool };
+
     // Compose the routes
     let app = Router::new()
         .merge(service_todos())
@@ -43,7 +47,7 @@ async fn main() {
                 .layer(TraceLayer::new_for_http())
                 .into_inner(),
         )
-        .with_state(pool);
+        .with_state(app_state);
 
     let listener = tokio::net::TcpListener::bind(PORT_3000).await.unwrap();
 

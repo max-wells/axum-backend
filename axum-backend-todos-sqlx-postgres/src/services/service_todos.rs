@@ -8,7 +8,7 @@ use axum::{
 
 use crate::{
     models::models_todos::{ApiError, CreateTodo, Todo, UpdateTodo},
-    utils::db::Db,
+    utils::db::AppState,
 };
 
 // * curl -X POST http://localhost:3000/todos -H "Content-Type: application/json" -d '{"text": "Buy groceries"}'
@@ -19,7 +19,7 @@ use crate::{
 /*                        🦀 MAIN 🦀                          */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-pub fn service_todos() -> Router<Db> {
+pub fn service_todos() -> Router<AppState> {
     Router::new()
         .route("/todos", get(todos_index).post(todos_create))
         .route("/todos/{id}", patch(todos_update).delete(todos_delete))
@@ -29,9 +29,9 @@ pub fn service_todos() -> Router<Db> {
 /*                     ✨ FUNCTIONS ✨                        */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-pub async fn todos_index(State(pool): State<Db>) -> Result<impl IntoResponse, StatusCode> {
+pub async fn todos_index(app_state: State<AppState>) -> Result<impl IntoResponse, StatusCode> {
     let todos = sqlx::query_as!(Todo, "SELECT * FROM todos ORDER BY created_at DESC")
-        .fetch_all(&pool)
+        .fetch_all(&app_state.db)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
@@ -43,15 +43,15 @@ pub async fn todos_index(State(pool): State<Db>) -> Result<impl IntoResponse, St
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 pub async fn todos_create(
-    State(pool): State<Db>,
-    Json(input): Json<CreateTodo>,
+    app_state: State<AppState>,
+    Json(body): Json<CreateTodo>,
 ) -> Result<impl IntoResponse, StatusCode> {
     let todo = sqlx::query_as!(
         Todo,
         "INSERT INTO todos (text) VALUES ($1) RETURNING id, text, created_at, updated_at",
-        input.text
+        body.text
     )
-    .fetch_one(&pool)
+    .fetch_one(&app_state.db)
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
@@ -60,17 +60,17 @@ pub async fn todos_create(
 
 pub async fn todos_update(
     Path(id): Path<i32>,
-    State(pool): State<Db>,
-    Json(input): Json<UpdateTodo>,
+    app_state: State<AppState>,
+    Json(body): Json<UpdateTodo>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ApiError>)> {
-    if let Some(text) = input.text {
+    if let Some(text) = body.text {
         let todo = sqlx::query_as!(
             Todo,
             "UPDATE todos SET text = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
             text,
             id
         )
-        .fetch_one(&pool)
+        .fetch_one(&app_state.db)
         .await
         .map_err(|err| {
             if err.to_string().contains("no rows") {
@@ -103,10 +103,10 @@ pub async fn todos_update(
 
 pub async fn todos_delete(
     Path(id): Path<i32>,
-    State(pool): State<Db>,
+    app_state: State<AppState>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ApiError>)> {
     let result = sqlx::query!("DELETE FROM todos WHERE id = $1", id)
-        .execute(&pool)
+        .execute(&app_state.db)
         .await
         .map_err(|_| {
             (
