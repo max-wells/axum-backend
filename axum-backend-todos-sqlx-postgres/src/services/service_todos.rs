@@ -29,17 +29,20 @@ pub fn service_todos() -> Router<Db> {
 /*                     ✨ FUNCTIONS ✨                        */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-pub async fn todos_index(pagination: Query<Pagination>, State(db): State<Db>) -> impl IntoResponse {
-    let todos = db.read().unwrap();
+pub async fn todos_index(
+    pagination: Query<Pagination>,
+    State(pool): State<Db>,
+) -> Result<impl IntoResponse, StatusCode> {
+    let todos = sqlx::query_as::<_, Todo>(
+        "SELECT * FROM todos ORDER BY created_at DESC LIMIT $1 OFFSET $2",
+    )
+    .bind(pagination.limit.unwrap_or(10) as i64)
+    .bind(pagination.offset.unwrap_or(0) as i64)
+    .fetch_all(&pool)
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let todos = todos
-        .values()
-        .skip(pagination.offset.unwrap_or(0))
-        .take(pagination.limit.unwrap_or(usize::MAX))
-        .cloned()
-        .collect::<Vec<_>>();
-
-    Json(todos)
+    Ok(Json(todos))
 }
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
@@ -47,47 +50,48 @@ pub async fn todos_index(pagination: Query<Pagination>, State(db): State<Db>) ->
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 pub async fn todos_create(
-    State(db): State<Db>,
+    State(pool): State<Db>,
     Json(input): Json<CreateTodo>,
-) -> impl IntoResponse {
-    let mut todos = db.write().unwrap();
-    let id = todos.len() as i32 + 1;
+) -> Result<impl IntoResponse, StatusCode> {
+    let todo = sqlx::query_as::<_, Todo>("INSERT INTO todos (text) VALUES ($1) RETURNING *")
+        .bind(input.text)
+        .fetch_one(&pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let todo = Todo {
-        id,
-        text: input.text,
-    };
-
-    todos.insert(todo.id, todo.clone());
-
-    (StatusCode::CREATED, Json(todo))
+    Ok((StatusCode::CREATED, Json(todo)))
 }
 
 pub async fn todos_update(
     Path(id): Path<i32>,
-    State(db): State<Db>,
+    State(pool): State<Db>,
     Json(input): Json<UpdateTodo>,
 ) -> Result<impl IntoResponse, StatusCode> {
-    let mut todo = db
-        .read()
-        .unwrap()
-        .get(&id)
-        .cloned()
-        .ok_or(StatusCode::NOT_FOUND)?;
-
     if let Some(text) = input.text {
-        todo.text = text;
+        let todo = sqlx::query_as::<_, Todo>(
+            "UPDATE todos SET text = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
+        )
+        .bind(text)
+        .bind(id)
+        .fetch_one(&pool)
+        .await
+        .map_err(|_| StatusCode::NOT_FOUND)?;
+
+        Ok(Json(todo))
+    } else {
+        Err(StatusCode::BAD_REQUEST)
     }
-
-    db.write().unwrap().insert(todo.id, todo.clone());
-
-    Ok(Json(todo))
 }
 
-pub async fn todos_delete(Path(id): Path<i32>, State(db): State<Db>) -> impl IntoResponse {
-    if db.write().unwrap().remove(&id).is_some() {
-        StatusCode::NO_CONTENT
-    } else {
-        StatusCode::NOT_FOUND
-    }
+pub async fn todos_delete(
+    Path(id): Path<i32>,
+    State(pool): State<Db>,
+) -> Result<impl IntoResponse, StatusCode> {
+    sqlx::query("DELETE FROM todos WHERE id = $1")
+        .bind(id)
+        .execute(&pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    Ok(StatusCode::NO_CONTENT)
 }
