@@ -1,9 +1,13 @@
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
+use time::OffsetDateTime;
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, FromRow)]
 pub struct Todo {
     pub id: i32,
     pub text: String,
+    pub created_at: OffsetDateTime,
+    pub updated_at: OffsetDateTime,
 }
 
 // The query parameters for todos index

@@ -3,7 +3,9 @@ use constants::others::PORT_3000;
 use std::time::Duration;
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
-use utils::{db::Db, handle_timeout_error::handle_timeout_error, setup_tracing::setup_tracing};
+use utils::{
+    db::create_db_pool, handle_timeout_error::handle_timeout_error, setup_tracing::setup_tracing,
+};
 
 mod constants;
 mod models;
@@ -20,9 +22,15 @@ use crate::services::service_todos::service_todos;
 
 #[tokio::main]
 async fn main() {
+    // Load .env file
+    dotenvy::dotenv().ok();
+
     setup_tracing();
 
-    let db = Db::default();
+    // Initialize the database pool
+    let pool = create_db_pool()
+        .await
+        .expect("Failed to create database pool");
 
     // Compose the routes
     let app = Router::new()
@@ -35,7 +43,7 @@ async fn main() {
                 .layer(TraceLayer::new_for_http())
                 .into_inner(),
         )
-        .with_state(db);
+        .with_state(pool);
 
     let listener = tokio::net::TcpListener::bind(PORT_3000).await.unwrap();
 
