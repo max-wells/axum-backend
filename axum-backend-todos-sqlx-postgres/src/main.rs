@@ -1,5 +1,5 @@
 use axum::{error_handling::HandleErrorLayer, Router};
-use constants::others::PORT_3000;
+use constants::others::PORT_8000;
 use std::time::Duration;
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
@@ -49,7 +49,7 @@ async fn main() {
         )
         .with_state(app_state);
 
-    let listener = tokio::net::TcpListener::bind(PORT_3000).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(PORT_8000).await.unwrap();
 
     tracing::debug!("listening on {}", listener.local_addr().unwrap());
 

@@ -11,9 +11,9 @@ use crate::{
     utils::db::AppState,
 };
 
-// * curl -X POST http://localhost:3000/todos -H "Content-Type: application/json" -d '{"text": "Buy groceries"}'
-// * curl -X PATCH http://localhost:3000/todos/1 -H "Content-Type: application/json" -d '{"text": "Buy more groceries"}'
-// * curl -X DELETE http://localhost:3000/todos/1
+// * curl -X POST http://localhost:8000/todos -H "Content-Type: application/json" -d '{"text": "Buy groceries"}'
+// * curl -X PATCH http://localhost:8000/todos/1 -H "Content-Type: application/json" -d '{"text": "Buy more groceries"}'
+// * curl -X DELETE http://localhost:8000/todos/1
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */
