@@ -1,6 +1,3 @@
-use crate::ctx::Ctx;
-use crate::error::ClientError;
-use crate::{Error, Result};
 use axum::http::{Method, Uri};
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -8,14 +5,19 @@ use serde_with::skip_serializing_none;
 use std::time::{SystemTime, UNIX_EPOCH};
 use uuid::Uuid;
 
+use crate::common::ctx::Ctx;
+use crate::common::error::ClientError;
+use crate::common::error::MyError;
+use crate::common::error::MyResult;
+
 pub async fn log_request(
 	uuid: Uuid,
 	req_method: Method,
 	uri: Uri,
 	ctx: Option<Ctx>,
-	service_error: Option<&Error>,
+	service_error: Option<&MyError>,
 	client_error: Option<ClientError>,
-) -> Result<()> {
+) -> MyResult<()> {
 	let timestamp = SystemTime::now()
 		.duration_since(UNIX_EPOCH)
 		.unwrap()

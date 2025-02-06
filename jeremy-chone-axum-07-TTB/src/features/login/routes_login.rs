@@ -5,7 +5,7 @@ use serde_json::{json, Value};
 use tower_cookies::{Cookie, Cookies};
 
 use crate::midleware::AUTH_TOKEN;
-use crate::{Error, Result};
+use crate::{MyError, MyResult};
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */
@@ -28,12 +28,12 @@ struct LoginPayload {
 async fn api_login(
 	cookies: Cookies,
 	payload: Json<LoginPayload>,
-) -> Result<Json<Value>> {
+) -> MyResult<Json<Value>> {
 	println!("->> {:<12} - api_login", "HANDLER");
 
 	// TODO: Implement real db/auth logic.
 	if payload.username != "demo1" || payload.pwd != "welcome" {
-		return Err(Error::LoginFail);
+		return Err(MyError::LoginFail);
 	}
 
 	// FIXME: Implement real auth-token generation/signature.

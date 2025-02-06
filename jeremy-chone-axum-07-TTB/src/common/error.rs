@@ -2,11 +2,11 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use serde::Serialize;
 
-pub type Result<T> = core::result::Result<T, Error>;
+pub type MyResult<T> = core::result::Result<T, MyError>;
 
 #[derive(Clone, Debug, Serialize, strum_macros::AsRefStr)]
 #[serde(tag = "type", content = "data")]
-pub enum Error {
+pub enum MyError {
 	LoginFail,
 
 	// -- Auth errors.
@@ -19,7 +19,7 @@ pub enum Error {
 }
 
 // region:    --- Error Boilerplate
-impl core::fmt::Display for Error {
+impl core::fmt::Display for MyError {
 	fn fmt(
 		&self,
 		fmt: &mut core::fmt::Formatter,
@@ -28,10 +28,10 @@ impl core::fmt::Display for Error {
 	}
 }
 
-impl std::error::Error for Error {}
+impl std::error::Error for MyError {}
 // endregion: --- Error Boilerplate
 
-impl IntoResponse for Error {
+impl IntoResponse for MyError {
 	fn into_response(self) -> Response {
 		println!("->> {:<12} - {self:?}", "INTO_RES");
 
@@ -45,7 +45,7 @@ impl IntoResponse for Error {
 	}
 }
 
-impl Error {
+impl MyError {
 	pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
 		#[allow(unreachable_patterns)]
 		match self {

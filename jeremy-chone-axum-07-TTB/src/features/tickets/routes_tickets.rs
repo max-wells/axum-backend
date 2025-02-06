@@ -2,11 +2,11 @@ use axum::extract::{Path, State};
 use axum::routing::{delete, post};
 use axum::{Json, Router};
 
-use crate::ctx::Ctx;
-use crate::Result;
+use crate::common::ctx::Ctx;
+use crate::MyResult;
 
+use crate::common::model_controller::ModelController;
 use crate::features::tickets::models_tickets::{Ticket, TicketForCreate};
-use crate::model_controller::ModelController;
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */
@@ -28,7 +28,7 @@ async fn create_ticket(
 	State(model_controller): State<ModelController>,
 	ctx: Ctx,
 	Json(ticket_fc): Json<TicketForCreate>,
-) -> Result<Json<Ticket>> {
+) -> MyResult<Json<Ticket>> {
 	println!("->> {:<12} - create_ticket", "HANDLER");
 
 	let ticket = model_controller.create_ticket(ctx, ticket_fc).await?;
@@ -40,7 +40,7 @@ async fn create_ticket(
 async fn list_tickets(
 	State(model_controller): State<ModelController>,
 	ctx: Ctx,
-) -> Result<Json<Vec<Ticket>>> {
+) -> MyResult<Json<Vec<Ticket>>> {
 	println!("->> {:<12} - list_tickets", "HANDLER");
 
 	let tickets = model_controller.list_tickets(ctx).await?;
@@ -53,7 +53,7 @@ async fn delete_ticket(
 	State(model_controller): State<ModelController>,
 	ctx: Ctx,
 	Path(id): Path<u64>,
-) -> Result<Json<Ticket>> {
+) -> MyResult<Json<Ticket>> {
 	println!(">>> {:<12} - delete_ticket", "HANDLER");
 
 	let ticket = model_controller.delete_ticket(ctx, id).await?;
