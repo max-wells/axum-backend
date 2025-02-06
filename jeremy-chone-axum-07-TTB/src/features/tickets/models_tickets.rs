@@ -1,8 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::sync::{Arc, Mutex};
-
-use crate::common::ctx::Ctx;
-use crate::{MyError, MyResult};
 
 #[derive(Clone, Debug, Serialize)]
 pub struct Ticket {

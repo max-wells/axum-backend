@@ -1,14 +1,7 @@
-use axum::extract::{Path, Query};
 use axum::http::{Method, Uri};
-use axum::response::{Html, IntoResponse, Response};
-use axum::routing::{get, get_service};
-use axum::{middleware, Json, Router};
-use serde::Deserialize;
+use axum::response::{IntoResponse, Response};
+use axum::Json;
 use serde_json::json;
-use std::net::SocketAddr;
-use tokio::net::TcpListener;
-use tower_cookies::CookieManagerLayer;
-use tower_http::services::ServeDir;
 use uuid::Uuid;
 
 use crate::common::log::log_request;

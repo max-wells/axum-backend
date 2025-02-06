@@ -1,5 +1,5 @@
 use axum::extract::{Path, Query};
-use axum::response::{Html, IntoResponse, Response};
+use axum::response::{Html, IntoResponse};
 use axum::routing::{get, get_service};
 use axum::Router;
 use serde::Deserialize;

@@ -1,4 +1,3 @@
-use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 
 use crate::common::ctx::Ctx;
