@@ -9,19 +9,25 @@ pub fn routes_static() -> Router {
 	Router::new().nest_service("/", get_service(ServeDir::new("./")))
 }
 
-// region:    --- Routes Hello
+/*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+/*                        🦀 MAIN 🦀                          */
+/*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
 pub fn routes_hello() -> Router {
 	Router::new()
 		.route("/hello", get(handler_hello))
 		.route("/hello2/:name", get(handler_hello2))
 }
 
+/*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+/*                     ✨ FUNCTIONS ✨                        */
+/*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
 #[derive(Debug, Deserialize)]
 pub struct HelloParams {
 	pub name: Option<String>,
 }
 
-// e.g., `/hello?name=Jen`
 pub async fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoResponse {
 	println!("->> {:<12} - handler_hello - {params:?}", "HANDLER");
 
@@ -29,11 +35,12 @@ pub async fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoRespon
 	Html(format!("Hello <strong>{name}</strong>"))
 }
 
-// e.g., `/hello2/Mike`
+/*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+/*                     ✨ FUNCTIONS ✨                        */
+/*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
 pub async fn handler_hello2(Path(name): Path<String>) -> impl IntoResponse {
 	println!("->> {:<12} - handler_hello2 - {name:?}", "HANDLER");
 
 	Html(format!("Hello2 <strong>{name}</strong>"))
 }
-
-// endregion: --- Routes Hello

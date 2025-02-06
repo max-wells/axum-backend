@@ -12,7 +12,7 @@ use axum::response::Response;
 use lazy_regex::regex_captures;
 use tower_cookies::{Cookie, Cookies};
 
-pub async fn mw_require_auth(
+pub async fn middleware_require_auth(
 	ctx: Result<Ctx>,
 	req: Request<Body>,
 	next: Next,
@@ -24,7 +24,7 @@ pub async fn mw_require_auth(
 	Ok(next.run(req).await)
 }
 
-pub async fn mw_ctx_resolver(
+pub async fn middleware_ctx_resolver(
 	_mc: State<ModelController>,
 	cookies: Cookies,
 	mut req: Request<Body>,
@@ -74,6 +74,10 @@ impl<S: Send + Sync> FromRequestParts<S> for Ctx {
 			.clone()
 	}
 }
+
+/*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+/*                     ✨ FUNCTIONS ✨                        */
+/*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 // endregion: --- Ctx Extractor
 

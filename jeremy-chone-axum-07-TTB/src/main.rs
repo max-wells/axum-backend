@@ -33,8 +33,9 @@ async fn main() -> Result<()> {
 	// Initialize ModelController.
 	let mc = ModelController::new().await?;
 
-	let routes_apis = web::routes_tickets::routes(mc.clone())
-		.route_layer(middleware::from_fn(web::mw_auth::mw_require_auth));
+	let routes_apis = web::routes_tickets::routes(mc.clone()).route_layer(
+		middleware::from_fn(web::middleware_auth::middleware_require_auth),
+	);
 
 	let routes_all = Router::new()
 		.merge(routes_hello())
@@ -43,7 +44,7 @@ async fn main() -> Result<()> {
 		.layer(middleware::map_response(main_response_mapper))
 		.layer(middleware::from_fn_with_state(
 			mc.clone(),
-			web::mw_auth::mw_ctx_resolver,
+			web::middleware_auth::middleware_ctx_resolver,
 		))
 		.layer(CookieManagerLayer::new())
 		.fallback_service(routes_static());
