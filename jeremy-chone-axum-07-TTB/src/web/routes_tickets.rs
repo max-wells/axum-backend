@@ -1,50 +1,60 @@
-use crate::ctx::Ctx;
-use crate::model::{ModelController, Ticket, TicketForCreate};
-use crate::Result;
 use axum::extract::{Path, State};
 use axum::routing::{delete, post};
 use axum::{Json, Router};
 
-pub fn routes(mc: ModelController) -> Router {
+use crate::ctx::Ctx;
+use crate::model::{ModelController, Ticket, TicketForCreate};
+use crate::Result;
+
+/*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+/*                        🦀 MAIN 🦀                          */
+/*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+pub fn routes_tickets(model_controller: ModelController) -> Router {
 	Router::new()
 		.route("/tickets", post(create_ticket).get(list_tickets))
 		.route("/tickets/:id", delete(delete_ticket))
-		.with_state(mc)
+		.with_state(model_controller)
 }
 
-// region:    --- REST Handlers
+/*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+/*                     ✨ FUNCTIONS ✨                        */
+/*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+// 1. Create a ticket
 async fn create_ticket(
-	State(mc): State<ModelController>,
+	State(model_controller): State<ModelController>,
 	ctx: Ctx,
 	Json(ticket_fc): Json<TicketForCreate>,
 ) -> Result<Json<Ticket>> {
 	println!("->> {:<12} - create_ticket", "HANDLER");
 
-	let ticket = mc.create_ticket(ctx, ticket_fc).await?;
+	let ticket = model_controller.create_ticket(ctx, ticket_fc).await?;
 
 	Ok(Json(ticket))
 }
 
+// 2. List all tickets
 async fn list_tickets(
-	State(mc): State<ModelController>,
+	State(model_controller): State<ModelController>,
 	ctx: Ctx,
 ) -> Result<Json<Vec<Ticket>>> {
 	println!("->> {:<12} - list_tickets", "HANDLER");
 
-	let tickets = mc.list_tickets(ctx).await?;
+	let tickets = model_controller.list_tickets(ctx).await?;
 
 	Ok(Json(tickets))
 }
 
+// 3. Delete a ticket
 async fn delete_ticket(
-	State(mc): State<ModelController>,
+	State(model_controller): State<ModelController>,
 	ctx: Ctx,
 	Path(id): Path<u64>,
 ) -> Result<Json<Ticket>> {
 	println!(">>> {:<12} - delete_ticket", "HANDLER");
 
-	let ticket = mc.delete_ticket(ctx, id).await?;
+	let ticket = model_controller.delete_ticket(ctx, id).await?;
 
 	Ok(Json(ticket))
 }
-// endregion: --- REST Handlers

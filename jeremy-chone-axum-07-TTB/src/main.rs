@@ -33,7 +33,7 @@ async fn main() -> Result<()> {
 	// Initialize ModelController.
 	let mc = ModelController::new().await?;
 
-	let routes_apis = web::routes_tickets::routes(mc.clone()).route_layer(
+	let routes_apis = web::routes_tickets::routes_tickets(mc.clone()).route_layer(
 		middleware::from_fn(web::middleware_auth::middleware_require_auth),
 	);
 
