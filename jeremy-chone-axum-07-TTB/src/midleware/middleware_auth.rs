@@ -1,6 +1,4 @@
-use crate::ctx::Ctx;
-use crate::model::ModelController;
-use crate::web::AUTH_TOKEN;
+use crate::model_controller::ModelController;
 use crate::{Error, Result};
 use async_trait::async_trait;
 use axum::body::Body;
@@ -11,6 +9,9 @@ use axum::middleware::Next;
 use axum::response::Response;
 use lazy_regex::regex_captures;
 use tower_cookies::{Cookie, Cookies};
+
+use crate::ctx::Ctx;
+use crate::midleware::AUTH_TOKEN;
 
 pub async fn middleware_require_auth(
 	ctx: Result<Ctx>,

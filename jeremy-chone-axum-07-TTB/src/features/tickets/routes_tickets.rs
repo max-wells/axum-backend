@@ -3,8 +3,10 @@ use axum::routing::{delete, post};
 use axum::{Json, Router};
 
 use crate::ctx::Ctx;
-use crate::model::{ModelController, Ticket, TicketForCreate};
 use crate::Result;
+
+use crate::features::tickets::models_tickets::{Ticket, TicketForCreate};
+use crate::model_controller::ModelController;
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */

@@ -1,32 +1,15 @@
-//! Simplistic Model Layer
-//! (with mock-store layer)
-
-use crate::ctx::Ctx;
-use crate::{Error, Result};
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 
-// region:    --- Ticket Types
-#[derive(Clone, Debug, Serialize)]
-pub struct Ticket {
-	pub id: u64,
-	pub cid: u64, // creator user_id
-	pub title: String,
-}
+use crate::ctx::Ctx;
+use crate::features::tickets::models_tickets::{Ticket, TicketForCreate};
+use crate::{Error, Result};
 
-#[derive(Deserialize)]
-pub struct TicketForCreate {
-	pub title: String,
-}
-// endregion: --- Ticket Types
-
-// region:    --- Model Controller
 #[derive(Clone)]
 pub struct ModelController {
 	tickets_store: Arc<Mutex<Vec<Option<Ticket>>>>,
 }
 
-// Constructor
 impl ModelController {
 	pub async fn new() -> Result<Self> {
 		Ok(Self {
@@ -35,7 +18,6 @@ impl ModelController {
 	}
 }
 
-// CRUD Implementation
 impl ModelController {
 	pub async fn create_ticket(
 		&self,
@@ -71,5 +53,3 @@ impl ModelController {
 		ticket.ok_or(Error::TicketDeleteFailIdNotFound { id })
 	}
 }
-
-// endregion: --- Model Controller

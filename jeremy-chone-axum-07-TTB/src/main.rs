@@ -1,14 +1,10 @@
 pub use self::error::{Error, Result};
 
-use crate::ctx::Ctx;
-use crate::log::log_request;
-use crate::model::ModelController;
 use axum::extract::{Path, Query};
 use axum::http::{Method, Uri};
 use axum::response::{Html, IntoResponse, Response};
 use axum::routing::{get, get_service};
 use axum::{middleware, Json, Router};
-use hello::hello_routes::{routes_hello, routes_static};
 use serde::Deserialize;
 use serde_json::json;
 use std::net::SocketAddr;
@@ -19,10 +15,19 @@ use uuid::Uuid;
 
 mod ctx;
 mod error;
-mod hello;
+mod features;
 mod log;
-mod model;
-mod web;
+mod midleware;
+mod model_controller;
+
+use crate::ctx::Ctx;
+use crate::features::hello::hello_routes::{routes_hello, routes_static};
+use crate::features::login::routes_login::routes_login;
+use crate::features::tickets::routes_tickets::routes_tickets;
+use crate::log::log_request;
+use crate::model_controller::ModelController;
+
+// * cargo run
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */
@@ -33,18 +38,18 @@ async fn main() -> Result<()> {
 	// Initialize ModelController.
 	let mc = ModelController::new().await?;
 
-	let routes_apis = web::routes_tickets::routes_tickets(mc.clone()).route_layer(
-		middleware::from_fn(web::middleware_auth::middleware_require_auth),
-	);
+	let routes_apis = routes_tickets(mc.clone()).route_layer(middleware::from_fn(
+		midleware::middleware_auth::middleware_require_auth,
+	));
 
 	let routes_all = Router::new()
 		.merge(routes_hello())
-		.merge(web::routes_login::routes())
+		.merge(routes_login())
 		.nest("/api", routes_apis)
 		.layer(middleware::map_response(main_response_mapper))
 		.layer(middleware::from_fn_with_state(
 			mc.clone(),
-			web::middleware_auth::middleware_ctx_resolver,
+			midleware::middleware_auth::middleware_ctx_resolver,
 		))
 		.layer(CookieManagerLayer::new())
 		.fallback_service(routes_static());
