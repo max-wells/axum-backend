@@ -8,15 +8,29 @@ description = "Rust Axum Full Course code."
 homepage = "https://youtu.be/XZtlD_m59sM"
 repository = "https://github.com/rust-httpc-test"
 
+[workspace.lints.rust]
+unsafe_code = "forbid"
+unused = "allow" # For experimental dev.
+
+[lints]
+workspace = true
+
 [dependencies]
+# -- Async
 tokio = { version = "1", features = ["full"] }
-# Serde / json
+async-trait = "0.1"
+# -- Serde
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-
-# Axum
-axum = "0.6.16"
-tower-http = { version = "0.4.0", features = ["fs"] }
+serde_with = "3"
+# -- Web
+axum = "0.7"
+tower-http = { version = "0.5", features = ["fs"] }
+tower-cookies = "0.10"
+# -- Others
+lazy-regex = "3"
+strum_macros = "0.25"
+uuid = {version = "1", features = ["v4","fast-rng",]}
 
 
 [dev-dependencies]
@@ -26,6 +40,5 @@ httpc-test = "0.1.1"
 
 
 
-# * 💁 Added that to make rust-analyzer work. Still don't know why I had issue with ssr...
 [features]
 ssr = []
