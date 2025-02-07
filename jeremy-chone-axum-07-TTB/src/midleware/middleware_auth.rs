@@ -5,7 +5,6 @@ use axum::http::request::Parts;
 use axum::http::Request;
 use axum::middleware::Next;
 use axum::response::Response;
-use lazy_regex::regex_captures;
 use tower_cookies::{Cookie, Cookies};
 
 use crate::common::ctx::Ctx;
@@ -13,6 +12,11 @@ use crate::common::error::MyError;
 use crate::common::error::MyResult;
 use crate::common::model_controller::ModelController;
 use crate::midleware::AUTH_TOKEN;
+use crate::utils::parse_token::parse_token;
+
+/*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+/*                     ✨ FUNCTIONS ✨                        */
+/*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 pub async fn middleware_require_auth(
 	ctx: MyResult<Ctx>,
@@ -61,7 +65,6 @@ pub async fn middleware_ctx_resolver(
 	Ok(next.run(req).await)
 }
 
-// region:    --- Ctx Extractor
 #[async_trait]
 impl<S: Send + Sync> FromRequestParts<S> for Ctx {
 	type Rejection = MyError;
@@ -75,26 +78,4 @@ impl<S: Send + Sync> FromRequestParts<S> for Ctx {
 			.ok_or(MyError::AuthFailCtxNotInRequestExt)?
 			.clone()
 	}
-}
-
-/*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
-/*                     ✨ FUNCTIONS ✨                        */
-/*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
-
-// endregion: --- Ctx Extractor
-
-/// Parse a token of format `user-[user-id].[expiration].[signature]`
-/// Returns (user_id, expiration, signature)
-fn parse_token(token: String) -> MyResult<(u64, String, String)> {
-	let (_whole, user_id, exp, sign) = regex_captures!(
-		r#"^user-(\d+)\.(.+)\.(.+)"#, // a literal regex
-		&token
-	)
-	.ok_or(MyError::AuthFailTokenWrongFormat)?;
-
-	let user_id: u64 = user_id
-		.parse()
-		.map_err(|_| MyError::AuthFailTokenWrongFormat)?;
-
-	Ok((user_id, exp.to_string(), sign.to_string()))
 }
