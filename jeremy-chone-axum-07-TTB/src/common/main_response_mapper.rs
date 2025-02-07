@@ -8,7 +8,7 @@ use super::ctx::Ctx;
 use crate::common::error::MyError;
 use crate::common::log::log_request;
 
-pub async fn main_response_mapper(
+pub async fn my_main_response_mapper(
 	ctx: Option<Ctx>,
 	uri: Uri,
 	req_method: Method,

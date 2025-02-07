@@ -18,7 +18,7 @@ use crate::utils::parse_token::parse_token;
 /*                     ✨ FUNCTIONS ✨                        */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-pub async fn middleware_require_auth(
+pub async fn my_middleware_require_auth(
 	ctx: MyResult<Ctx>,
 	req: Request<Body>,
 	next: Next,
@@ -33,7 +33,7 @@ pub async fn middleware_require_auth(
 	Ok(next.run(req).await)
 }
 
-pub async fn middleware_ctx_resolver(
+pub async fn my_middleware_context_resolver(
 	_mc: State<ModelController>,
 	cookies: Cookies,
 	mut req: Request<Body>,

@@ -1,6 +1,5 @@
-use axum::{middleware, Router};
-use common::error::MyResult;
-use common::model_controller::ModelController;
+use axum::middleware::{from_fn, from_fn_with_state, map_response};
+use axum::Router;
 use tokio::net::TcpListener;
 use tower_cookies::CookieManagerLayer;
 
@@ -9,12 +8,18 @@ mod features;
 mod midleware;
 mod utils;
 
-use crate::common::main_response_mapper::main_response_mapper;
+use crate::common::error::MyResult;
+use crate::common::main_response_mapper::my_main_response_mapper;
+use crate::common::model_controller::ModelController;
 use crate::features::hello::hello_routes::{routes_hello, routes_static};
 use crate::features::login::routes_login::routes_login;
 use crate::features::tickets::routes_tickets::routes_tickets;
+use crate::midleware::middleware_auth::my_middleware_context_resolver;
+use crate::midleware::middleware_auth::my_middleware_require_auth;
 
 // * cargo run
+
+const PORT_8000: &str = "127.0.0.1:8000";
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */
@@ -26,25 +31,25 @@ async fn main() -> MyResult<()> {
 	let model_controller = ModelController::new().await?;
 
 	// ? Understand why there are no arguments in middleware_require_auth function (should take 3)
-	let routes_apis = routes_tickets(model_controller.clone()).route_layer(middleware::from_fn(
-		midleware::middleware_auth::middleware_require_auth,
-	));
+	// ? Is it because of the from_fn ?
+	let routes_apis =
+		routes_tickets(model_controller.clone()).route_layer(from_fn(my_middleware_require_auth));
 
+	// ? Understand from_fn_with_state
 	let routes_all = Router::new()
 		.merge(routes_hello())
 		.merge(routes_login())
 		.nest("/api", routes_apis)
-		.layer(middleware::map_response(main_response_mapper))
-		.layer(middleware::from_fn_with_state(
+		.layer(map_response(my_main_response_mapper))
+		.layer(from_fn_with_state(
 			model_controller.clone(),
-			midleware::middleware_auth::middleware_ctx_resolver,
+			my_middleware_context_resolver,
 		))
 		.layer(CookieManagerLayer::new())
 		.fallback_service(routes_static());
 
-	let listener = TcpListener::bind("127.0.0.1:8000").await.unwrap();
-
-	println!("->> LISTENING on {:?}\n", listener.local_addr());
+	let listener = TcpListener::bind(PORT_8000).await.unwrap();
+	println!("🚀 LISTENING on {:?}\n", listener.local_addr());
 
 	// ? Undserstand into_make_service
 	axum::serve(listener, routes_all.into_make_service())
