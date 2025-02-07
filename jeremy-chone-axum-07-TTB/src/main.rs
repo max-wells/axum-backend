@@ -31,12 +31,13 @@ async fn main() -> MyResult<()> {
 	// ? Undserstand model_controller
 	let model_controller = ModelController::new().await?;
 
-	// ? Understand why there are no arguments in middleware_require_auth function (should take 3)
+	// ? Why my_middleware_require_auth() takes no arguments ? Should have 3 arguments
 	// ? Is it because of the from_fn ?
 	let routes_apis =
 		routes_tickets(model_controller.clone()).route_layer(from_fn(my_middleware_require_auth));
 
-	// ? Understand from_fn_with_state
+	// ? from_fn_with_state()
+	// ? nest()
 	let routes_all = Router::new()
 		.merge(routes_hello())
 		.merge(routes_login())
@@ -52,7 +53,7 @@ async fn main() -> MyResult<()> {
 	let listener = TcpListener::bind(PORT_8000).await.unwrap();
 	println!("🚀 LISTENING on {:?}\n", listener.local_addr());
 
-	// ? Undserstand into_make_service
+	// ? into_make_service()
 	axum::serve(listener, routes_all.into_make_service())
 		.await
 		.unwrap();

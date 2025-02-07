@@ -1,4 +1,5 @@
 use anyhow::Result;
+use httpc_test::Client;
 use serde_json::json;
 
 const LOCALHOST_8000: &str = "http://localhost:8000";
@@ -25,7 +26,7 @@ async fn main() -> Result<()> {
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 // 1. Basics
-async fn demo_basics(hc: &httpc_test::Client) -> Result<()> {
+async fn demo_basics(hc: &Client) -> Result<()> {
 	hc.do_get("/hello2/Mike").await?.print().await?;
 	hc.do_get("/src/main.rs").await?.print().await?;
 
@@ -33,7 +34,7 @@ async fn demo_basics(hc: &httpc_test::Client) -> Result<()> {
 }
 
 // 2. Login
-async fn demo_login(hc: &httpc_test::Client) -> Result<()> {
+async fn demo_login(hc: &Client) -> Result<()> {
 	const URL_API_LOGIN: &str = "/api/login";
 
 	let req_login = hc.do_post(
@@ -49,7 +50,7 @@ async fn demo_login(hc: &httpc_test::Client) -> Result<()> {
 }
 
 // 3. Create Ticket
-async fn demo_create_and_get_ticket(hc: &httpc_test::Client) -> Result<()> {
+async fn demo_create_and_get_ticket(hc: &Client) -> Result<()> {
 	const URL_API_TICKETS: &str = "/api/tickets";
 
 	let req_create_ticket = hc.do_post(

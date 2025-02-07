@@ -4,12 +4,12 @@ use axum::Json;
 use serde_json::json;
 use uuid::Uuid;
 
-use super::ctx::Ctx;
+use super::context::Context;
 use crate::common::error::MyError;
-use crate::common::log::log_request;
+use crate::common::log_request::log_request;
 
 pub async fn my_main_response_mapper(
-	ctx: Option<Ctx>,
+	ctx: Option<Context>,
 	uri: Uri,
 	req_method: Method,
 	res: Response,

@@ -5,7 +5,7 @@ use serde_with::skip_serializing_none;
 use std::time::{SystemTime, UNIX_EPOCH};
 use uuid::Uuid;
 
-use crate::common::ctx::Ctx;
+use crate::common::context::Context;
 use crate::common::error::ClientError;
 use crate::common::error::MyError;
 use crate::common::error::MyResult;
@@ -14,7 +14,7 @@ pub async fn log_request(
 	uuid: Uuid,
 	req_method: Method,
 	uri: Uri,
-	ctx: Option<Ctx>,
+	ctx: Option<Context>,
 	service_error: Option<&MyError>,
 	client_error: Option<ClientError>,
 ) -> MyResult<()> {

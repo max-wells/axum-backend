@@ -7,7 +7,7 @@ use axum::middleware::Next;
 use axum::response::Response;
 use tower_cookies::{Cookie, Cookies};
 
-use crate::common::ctx::Ctx;
+use crate::common::context::Context;
 use crate::common::error::MyError;
 use crate::common::error::MyResult;
 use crate::common::model_controller::ModelController;
@@ -19,7 +19,7 @@ use crate::utils::parse_token::parse_token;
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 pub async fn my_middleware_require_auth(
-	ctx: MyResult<Ctx>,
+	ctx: MyResult<Context>,
 	req: Request<Body>,
 	next: Next,
 ) -> MyResult<Response> {
@@ -50,7 +50,7 @@ pub async fn my_middleware_context_resolver(
 	{
 		Ok((user_id, _exp, _sign)) => {
 			// TODO: Token components validations.
-			Ok(Ctx::new(user_id))
+			Ok(Context::new(user_id))
 		}
 		Err(e) => Err(e),
 	};
@@ -70,7 +70,7 @@ pub async fn my_middleware_context_resolver(
 //
 // ? Understand this
 #[async_trait]
-impl<S: Send + Sync> FromRequestParts<S> for Ctx {
+impl<S: Send + Sync> FromRequestParts<S> for Context {
 	type Rejection = MyError;
 
 	async fn from_request_parts(parts: &mut Parts, _state: &S) -> MyResult<Self> {
@@ -78,7 +78,7 @@ impl<S: Send + Sync> FromRequestParts<S> for Ctx {
 
 		parts
 			.extensions
-			.get::<MyResult<Ctx>>()
+			.get::<MyResult<Context>>()
 			.ok_or(MyError::AuthFailCtxNotInRequestExt)?
 			.clone()
 	}
