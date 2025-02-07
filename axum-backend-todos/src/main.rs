@@ -1,30 +1,30 @@
 use axum::{error_handling::HandleErrorLayer, Router};
-use constants::others::PORT_8000;
 use std::time::Duration;
+use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
-use utils::{db::Db, handle_timeout_error::handle_timeout_error, setup_tracing::setup_tracing};
 
 mod constants;
 mod models;
 mod services;
 mod utils;
 
+use crate::constants::others::PORT_8000;
 use crate::services::service_todos::service_todos;
+use crate::utils::{
+    db::DbArcRwLock, handle_timeout_error::handle_timeout_error, setup_tracing::setup_tracing,
+};
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-// ROLLBACK
-
 #[tokio::main]
 async fn main() {
     setup_tracing();
 
-    let db = Db::default();
+    let db = DbArcRwLock::default();
 
-    // Compose the routes
     let app = Router::new()
         .merge(service_todos())
         // Add middleware to all routes
@@ -37,9 +37,9 @@ async fn main() {
         )
         .with_state(db);
 
-    let listener = tokio::net::TcpListener::bind(PORT_8000).await.unwrap();
+    let listener = TcpListener::bind(PORT_8000).await.unwrap();
 
-    tracing::debug!("listening on {}", listener.local_addr().unwrap());
+    println!("🚀 Listening on {}", listener.local_addr().unwrap());
 
     axum::serve(listener, app).await.unwrap();
 }

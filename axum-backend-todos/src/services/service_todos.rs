@@ -8,7 +8,7 @@ use axum::{
 
 use crate::{
     models::models_todos::{CreateTodo, Pagination, Todo, UpdateTodo},
-    utils::db::Db,
+    utils::db::DbArcRwLock,
 };
 
 // * curl -X POST http://localhost:8000/todos -H "Content-Type: application/json" -d '{"text": "Buy groceries"}'
@@ -19,7 +19,7 @@ use crate::{
 /*                        🦀 MAIN 🦀                          */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-pub fn service_todos() -> Router<Db> {
+pub fn service_todos() -> Router<DbArcRwLock> {
     Router::new()
         .route("/todos", get(todos_index).post(todos_create))
         .route("/todos/{id}", patch(todos_update).delete(todos_delete))
@@ -29,7 +29,10 @@ pub fn service_todos() -> Router<Db> {
 /*                     ✨ FUNCTIONS ✨                        */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-pub async fn todos_index(pagination: Query<Pagination>, State(db): State<Db>) -> impl IntoResponse {
+pub async fn todos_index(
+    pagination: Query<Pagination>,
+    State(db): State<DbArcRwLock>,
+) -> impl IntoResponse {
     let todos = db.read().unwrap();
 
     let todos = todos
@@ -47,7 +50,7 @@ pub async fn todos_index(pagination: Query<Pagination>, State(db): State<Db>) ->
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 pub async fn todos_create(
-    State(db): State<Db>,
+    State(db): State<DbArcRwLock>,
     Json(input): Json<CreateTodo>,
 ) -> impl IntoResponse {
     let mut todos = db.write().unwrap();
@@ -65,7 +68,7 @@ pub async fn todos_create(
 
 pub async fn todos_update(
     Path(id): Path<i32>,
-    State(db): State<Db>,
+    State(db): State<DbArcRwLock>,
     Json(input): Json<UpdateTodo>,
 ) -> Result<impl IntoResponse, StatusCode> {
     let mut todo = db
@@ -84,7 +87,7 @@ pub async fn todos_update(
     Ok(Json(todo))
 }
 
-pub async fn todos_delete(Path(id): Path<i32>, State(db): State<Db>) -> impl IntoResponse {
+pub async fn todos_delete(Path(id): Path<i32>, State(db): State<DbArcRwLock>) -> impl IntoResponse {
     if db.write().unwrap().remove(&id).is_some() {
         StatusCode::NO_CONTENT
     } else {

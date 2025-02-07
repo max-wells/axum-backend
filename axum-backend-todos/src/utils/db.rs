@@ -5,4 +5,4 @@ use std::{
 
 use crate::models::models_todos::Todo;
 
-pub type Db = Arc<RwLock<HashMap<i32, Todo>>>;
+pub type DbArcRwLock = Arc<RwLock<HashMap<i32, Todo>>>;
