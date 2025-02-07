@@ -18,11 +18,7 @@ impl ModelController {
 }
 
 impl ModelController {
-	pub async fn create_ticket(
-		&self,
-		ctx: Ctx,
-		ticket_fc: TicketForCreate,
-	) -> MyResult<Ticket> {
+	pub async fn create_ticket(&self, ctx: Ctx, ticket_fc: TicketForCreate) -> MyResult<Ticket> {
 		let mut store = self.tickets_store.lock().unwrap();
 
 		let id = store.len() as u64;

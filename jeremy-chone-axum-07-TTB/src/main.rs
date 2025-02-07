@@ -26,9 +26,9 @@ async fn main() -> MyResult<()> {
 	let model_controller = ModelController::new().await?;
 
 	// ? Understand why there are no arguments in middleware_require_auth function (should take 3)
-	let routes_apis = routes_tickets(model_controller.clone()).route_layer(
-		middleware::from_fn(midleware::middleware_auth::middleware_require_auth),
-	);
+	let routes_apis = routes_tickets(model_controller.clone()).route_layer(middleware::from_fn(
+		midleware::middleware_auth::middleware_require_auth,
+	));
 
 	let routes_all = Router::new()
 		.merge(routes_hello())

@@ -20,10 +20,7 @@ pub enum MyError {
 
 // region:    --- Error Boilerplate
 impl core::fmt::Display for MyError {
-	fn fmt(
-		&self,
-		fmt: &mut core::fmt::Formatter,
-	) -> core::result::Result<(), core::fmt::Error> {
+	fn fmt(&self, fmt: &mut core::fmt::Formatter) -> core::result::Result<(), core::fmt::Error> {
 		write!(fmt, "{self:?}")
 	}
 }
@@ -54,9 +51,7 @@ impl MyError {
 			// -- Auth.
 			Self::AuthFailNoAuthTokenCookie
 			| Self::AuthFailTokenWrongFormat
-			| Self::AuthFailCtxNotInRequestExt => {
-				(StatusCode::FORBIDDEN, ClientError::NO_AUTH)
-			}
+			| Self::AuthFailCtxNotInRequestExt => (StatusCode::FORBIDDEN, ClientError::NO_AUTH),
 
 			// -- Model.
 			Self::TicketDeleteFailIdNotFound { .. } => {

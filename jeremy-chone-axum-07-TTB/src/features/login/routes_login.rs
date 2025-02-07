@@ -25,10 +25,7 @@ struct LoginPayload {
 	pwd: String,
 }
 
-async fn api_login(
-	cookies: Cookies,
-	payload: Json<LoginPayload>,
-) -> MyResult<Json<Value>> {
+async fn api_login(cookies: Cookies, payload: Json<LoginPayload>) -> MyResult<Json<Value>> {
 	println!("->> {:<12} - api_login", "HANDLER");
 
 	// TODO: Implement real db/auth logic.

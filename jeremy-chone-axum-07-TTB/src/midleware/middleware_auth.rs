@@ -23,7 +23,10 @@ pub async fn middleware_require_auth(
 	req: Request<Body>,
 	next: Next,
 ) -> MyResult<Response> {
-	println!("->> {:<12} - mw_require_auth - {ctx:?}", "MIDDLEWARE");
+	println!(
+		"->> {:<12} - middleware_require_auth - {ctx:?}",
+		"MIDDLEWARE"
+	);
 
 	ctx?;
 
@@ -36,7 +39,7 @@ pub async fn middleware_ctx_resolver(
 	mut req: Request<Body>,
 	next: Next,
 ) -> MyResult<Response> {
-	println!("->> {:<12} - mw_ctx_resolver", "MIDDLEWARE");
+	println!("->> {:<12} - middleware_context_resolver", "MIDDLEWARE");
 
 	let auth_token = cookies.get(AUTH_TOKEN).map(|c| c.value().to_string());
 
@@ -53,9 +56,7 @@ pub async fn middleware_ctx_resolver(
 	};
 
 	// Remove the cookie if something went wrong other than NoAuthTokenCookie.
-	if result_ctx.is_err()
-		&& !matches!(result_ctx, Err(MyError::AuthFailNoAuthTokenCookie))
-	{
+	if result_ctx.is_err() && !matches!(result_ctx, Err(MyError::AuthFailNoAuthTokenCookie)) {
 		cookies.remove(Cookie::from(AUTH_TOKEN))
 	}
 
@@ -65,6 +66,9 @@ pub async fn middleware_ctx_resolver(
 	Ok(next.run(req).await)
 }
 
+//
+//
+// ? Understand this
 #[async_trait]
 impl<S: Send + Sync> FromRequestParts<S> for Ctx {
 	type Rejection = MyError;
