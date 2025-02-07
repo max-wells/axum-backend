@@ -20,7 +20,7 @@ impl ModelController {
 impl ModelController {
 	pub async fn create_ticket(
 		&self,
-		ctx: Context,
+		context: Context,
 		ticket_fc: TicketForCreate,
 	) -> MyResult<Ticket> {
 		let mut store = self.tickets_store.lock().unwrap();
@@ -28,7 +28,7 @@ impl ModelController {
 		let id = store.len() as u64;
 		let ticket = Ticket {
 			id,
-			cid: ctx.user_id(),
+			creator_user_id: context.user_id(),
 			title: ticket_fc.title,
 		};
 		store.push(Some(ticket.clone()));

@@ -9,7 +9,7 @@ use crate::common::error::MyError;
 use crate::common::log_request::log_request;
 
 pub async fn my_main_response_mapper(
-	ctx: Option<Context>,
+	context: Option<Context>,
 	uri: Uri,
 	req_method: Method,
 	res: Response,
@@ -42,7 +42,7 @@ pub async fn my_main_response_mapper(
 	// Build and log the server log line.
 	let client_error = client_status_error.unzip().1;
 	// TODO: Need to hander if log_request fail (but should not fail request)
-	let _ = log_request(uuid, req_method, uri, ctx, service_error, client_error).await;
+	let _ = log_request(uuid, req_method, uri, context, service_error, client_error).await;
 
 	println!();
 	error_response.unwrap_or(res)

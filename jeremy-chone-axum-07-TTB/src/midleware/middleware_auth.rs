@@ -19,16 +19,16 @@ use crate::utils::parse_token::parse_token;
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 pub async fn my_middleware_require_auth(
-	ctx: MyResult<Context>,
+	context: MyResult<Context>,
 	req: Request<Body>,
 	next: Next,
 ) -> MyResult<Response> {
 	println!(
-		"->> {:<12} - middleware_require_auth - {ctx:?}",
+		"->> {:<12} - middleware_require_auth - {context:?}",
 		"MIDDLEWARE"
 	);
 
-	ctx?;
+	context?;
 
 	Ok(next.run(req).await)
 }

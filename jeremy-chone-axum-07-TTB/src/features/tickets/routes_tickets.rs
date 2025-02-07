@@ -26,12 +26,12 @@ pub fn routes_tickets(model_controller: ModelController) -> Router {
 // 1. Create a ticket
 async fn create_ticket(
 	State(model_controller): State<ModelController>,
-	ctx: Context,
+	context: Context,
 	Json(ticket_fc): Json<TicketForCreate>,
 ) -> MyResult<Json<Ticket>> {
 	println!("->> {:<12} - create_ticket", "HANDLER");
 
-	let ticket = model_controller.create_ticket(ctx, ticket_fc).await?;
+	let ticket = model_controller.create_ticket(context, ticket_fc).await?;
 
 	Ok(Json(ticket))
 }
@@ -39,11 +39,11 @@ async fn create_ticket(
 // 2. List all tickets
 async fn list_tickets(
 	State(model_controller): State<ModelController>,
-	ctx: Context,
+	context: Context,
 ) -> MyResult<Json<Vec<Ticket>>> {
 	println!("->> {:<12} - list_tickets", "HANDLER");
 
-	let tickets = model_controller.list_tickets(ctx).await?;
+	let tickets = model_controller.list_tickets(context).await?;
 
 	Ok(Json(tickets))
 }
@@ -51,12 +51,12 @@ async fn list_tickets(
 // 3. Delete a ticket
 async fn delete_ticket(
 	State(model_controller): State<ModelController>,
-	ctx: Context,
+	context: Context,
 	Path(id): Path<u64>,
 ) -> MyResult<Json<Ticket>> {
 	println!(">>> {:<12} - delete_ticket", "HANDLER");
 
-	let ticket = model_controller.delete_ticket(ctx, id).await?;
+	let ticket = model_controller.delete_ticket(context, id).await?;
 
 	Ok(Json(ticket))
 }
