@@ -4,10 +4,9 @@ use axum::Json;
 use serde_json::json;
 use uuid::Uuid;
 
-use crate::common::log::log_request;
-use crate::MyError;
-
 use super::ctx::Ctx;
+use crate::common::error::MyError;
+use crate::common::log::log_request;
 
 pub async fn main_response_mapper(
 	ctx: Option<Ctx>,
@@ -16,6 +15,7 @@ pub async fn main_response_mapper(
 	res: Response,
 ) -> Response {
 	println!("->> {:<12} - main_response_mapper", "RES_MAPPER");
+
 	let uuid = Uuid::new_v4();
 
 	// -- Get the eventual response error.

@@ -4,8 +4,8 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 use tower_cookies::{Cookie, Cookies};
 
+use crate::common::error::{MyError, MyResult};
 use crate::midleware::AUTH_TOKEN;
-use crate::{MyError, MyResult};
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */

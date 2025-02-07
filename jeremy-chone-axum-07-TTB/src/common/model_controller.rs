@@ -1,8 +1,8 @@
 use std::sync::{Arc, Mutex};
 
 use crate::common::ctx::Ctx;
+use crate::common::error::{MyError, MyResult};
 use crate::features::tickets::models_tickets::{Ticket, TicketForCreate};
-use crate::{MyError, MyResult};
 
 #[derive(Clone)]
 pub struct ModelController {

@@ -1,4 +1,5 @@
 use axum::{middleware, Router};
+use common::error::MyResult;
 use common::model_controller::ModelController;
 use tokio::net::TcpListener;
 use tower_cookies::CookieManagerLayer;
@@ -12,9 +13,6 @@ use crate::common::main_response_mapper::main_response_mapper;
 use crate::features::hello::hello_routes::{routes_hello, routes_static};
 use crate::features::login::routes_login::routes_login;
 use crate::features::tickets::routes_tickets::routes_tickets;
-
-// TODO. Understand this
-pub use self::common::error::{MyError, MyResult};
 
 // * cargo run
 
