@@ -1,0 +1,41 @@
+---
+description: Instructions for the imports of modules
+globs: *.rs
+---
+
+# Rules for the import of modules
+
+The general goal of this is to separate clearly my modules for the modules I import from external crates. Please follow these instructions :
+- Separate my modules from the ones of external crates
+- Always use full absolute paths for my crates (`use crate::xxxxx::yyyyy::zzzzz;`)
+- Each file imports should have its separate line. Do not nest different files in the same import. 
+- Sort them alphabetically.
+
+
+# Example
+
+## Before
+
+```rust
+use std::fs;
+use std::io;
+use my_module::sub_module;
+use serde::Serialize;
+use another_module::another_sub_module;
+```
+
+
+
+## After
+
+
+```rust
+use std::fs;
+use std::io;
+use serde::Serialize;
+
+use crate::another_module::another_sub_module;
+use crate::my_module::sub_module;
+```
+
+
