@@ -2,7 +2,6 @@ mod config;
 mod db;
 mod domain;
 mod middleware;
-mod models;
 mod routes;
 mod utils;
 

@@ -12,7 +12,7 @@ use validator::Validate;
 use crate::{
     db::UserExt,
     domain::{auth::dtos::dto_verify_email_query::VerifyEmailQueryDto, mail::mails::send_welcome_email},
-    utils::{my_errors::{MyErrorMessage, MyHttpError}, token},
+    utils::{my_errors::{MyErrorMessage, MyHttpError}, utils_token},
     AppState,
 };
 
@@ -54,7 +54,7 @@ pub async fn verify_email(
         eprintln!("Failed to send welcome email: {}", e);
     }
 
-    let token = token::create_token(
+    let token = utils_token::create_token(
         &user.id.to_string(),
         app_state.env.jwt_secret.as_bytes(),
         app_state.env.jwt_maxage,

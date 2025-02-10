@@ -13,8 +13,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     db::UserExt,
-    models::{User, UserRole},
-    utils::{my_errors::{MyErrorMessage, MyHttpError}, token},
+    domain::users::models::models_user::{User, UserRole},
+    utils::{my_errors::{MyErrorMessage, MyHttpError}, utils_token},
     AppState,
 };
 
@@ -47,7 +47,7 @@ pub async fn auth(
 
     let token = cookies.ok_or_else(|| MyHttpError::unauthorized(MyErrorMessage::TokenNotProvided.to_string()))?;
 
-    let token_details = match token::decode_token(token, app_state.env.jwt_secret.as_bytes()) {
+    let token_details = match utils_token::decode_token(token, app_state.env.jwt_secret.as_bytes()) {
         Ok(token_details) => token_details,
         Err(_) => {
             return Err(MyHttpError::unauthorized(MyErrorMessage::InvalidToken.to_string()));

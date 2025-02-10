@@ -10,7 +10,7 @@ use crate::{
     db::UserExt,
     domain::auth::dtos::dto_password::ResetPasswordRequestDto,
     utils::my_errors::MyHttpError,
-    utils::{my_response::MyResponse, password},
+    utils::{my_response::MyResponse, utils_password},
     AppState,
 };
 
@@ -42,7 +42,7 @@ pub async fn reset_password(
 
     let user_id = uuid::Uuid::parse_str(&user.id.to_string()).unwrap();
 
-    let hash_password = password::hash(&body.new_password).map_err(|e| MyHttpError::server_error(e.to_string()))?;
+    let hash_password = utils_password::hash(&body.new_password).map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     app_state
         .db_client

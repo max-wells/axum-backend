@@ -10,7 +10,7 @@ use validator::Validate;
 use crate::{
     db::UserExt,
     domain::{ auth::dtos::dto_register_user::RegisterUserDto, mail::mails::send_verification_email},
-    utils::{my_errors::{MyErrorMessage, MyHttpError}, my_response::MyResponse, password},
+    utils::{my_errors::{MyErrorMessage, MyHttpError}, my_response::MyResponse, utils_password},
     AppState,
 };
 
@@ -24,7 +24,7 @@ pub async fn register(
     let verification_token = uuid::Uuid::new_v4().to_string();
     let expires_at = Utc::now() + Duration::hours(24);
 
-    let hash_password = password::hash(&body.password).map_err(|e| MyHttpError::server_error(e.to_string()))?;
+    let hash_password = utils_password::hash(&body.password).map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     let result = app_state
         .db_client

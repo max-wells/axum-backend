@@ -11,7 +11,7 @@ use crate::{
     db::UserExt,
     domain::auth::dtos::dto_login_user::LoginUserDto,
     domain::auth::dtos::dto_login_user::UserLoginResponseDto,
-    utils::{my_errors::{MyErrorMessage, MyHttpError}, password, token},
+    utils::{my_errors::{MyErrorMessage, MyHttpError}, utils_password, utils_token},
     AppState,
 };
 
@@ -29,11 +29,11 @@ pub async fn login(
 
     let user = result.ok_or(MyHttpError::bad_request(MyErrorMessage::WrongCredentials.to_string()))?;
 
-    let password_matched = password::compare(&body.password, &user.password)
+    let password_matched = utils_password::compare(&body.password, &user.password)
         .map_err(|_| MyHttpError::bad_request(MyErrorMessage::WrongCredentials.to_string()))?;
 
     if password_matched {
-        let token = token::create_token(
+        let token = utils_token::create_token(
             &user.id.to_string(),
             &app_state.env.jwt_secret.as_bytes(),
             app_state.env.jwt_maxage,

@@ -3,7 +3,7 @@ use core::str;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::models::{User, UserRole};
+use crate::domain::users::models::models_user::{User, UserRole};
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                     ✨ FUNCTIONS ✨                        */

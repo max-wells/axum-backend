@@ -8,7 +8,7 @@ use validator::Validate;
 use crate::{
     db::UserExt,
     domain::users::dtos::dtos::{UserPasswordUpdateDto},
-    utils::{my_errors::{MyErrorMessage, MyHttpError}, my_response::MyResponse, password},
+    utils::{my_errors::{MyErrorMessage, MyHttpError}, my_response::MyResponse, utils_password},
     middleware::{JWTAuthMiddeware},
     AppState,
 };
@@ -34,13 +34,13 @@ pub async fn users_update_password(
     let user = result.ok_or(MyHttpError::unauthorized(MyErrorMessage::InvalidToken.to_string()))?;
 
     let password_match =
-        password::compare(&body.old_password, &user.password).map_err(|e| MyHttpError::server_error(e.to_string()))?;
+        utils_password::compare(&body.old_password, &user.password).map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     if !password_match {
         return Err(MyHttpError::bad_request("Old password is incorrect".to_string()));
     }
 
-    let hash_password = password::hash(&body.new_password).map_err(|e| MyHttpError::server_error(e.to_string()))?;
+    let hash_password = utils_password::hash(&body.new_password).map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     app_state
         .db_client

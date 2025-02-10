@@ -8,7 +8,7 @@ use super::{
     users_get_all::users_get_all, users_get_me::users_get_me, users_update_name::users_update_name,
     users_update_password::users_update_password, users_update_role::users_update_role,
 };
-use crate::{middleware::role_check, models::UserRole};
+use crate::{domain::users::models::models_user::UserRole, middleware::role_check};
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */
