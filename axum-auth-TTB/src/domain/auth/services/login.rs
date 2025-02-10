@@ -11,8 +11,7 @@ use crate::{
     db::UserExt,
     domain::auth::dtos::dto_login_user::LoginUserDto,
     domain::auth::dtos::dto_login_user::UserLoginResponseDto,
-    error::{MyErrorMessage, MyHttpError},
-    utils::{password, token},
+    utils::{my_errors::{MyErrorMessage, MyHttpError}, password, token},
     AppState,
 };
 

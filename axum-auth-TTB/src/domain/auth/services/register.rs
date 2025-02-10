@@ -10,8 +10,7 @@ use validator::Validate;
 use crate::{
     db::UserExt,
     domain::{ auth::dtos::dto_register_user::RegisterUserDto, mail::mails::send_verification_email},
-    error::{MyErrorMessage, MyHttpError},
-    utils::{my_response::MyResponse, password},
+    utils::{my_errors::{MyErrorMessage, MyHttpError}, my_response::MyResponse, password},
     AppState,
 };
 

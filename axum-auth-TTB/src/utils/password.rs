@@ -3,7 +3,11 @@ use argon2::{
     Argon2,
 };
 
-use crate::error::MyErrorMessage;
+use crate::utils::my_errors::MyErrorMessage;
+
+/*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+/*                     ✨ FUNCTIONS ✨                        */
+/*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
 const MAX_PASSWORD_LENGTH: usize = 64;
 

@@ -8,9 +8,8 @@ use validator::Validate;
 use crate::{
     db::UserExt,
     domain::users::dtos::dtos::{UserPasswordUpdateDto},
-    error::{MyErrorMessage, MyHttpError},
+    utils::{my_errors::{MyErrorMessage, MyHttpError}, my_response::MyResponse, password},
     middleware::{JWTAuthMiddeware},
-    utils::{my_response::MyResponse, password},
     AppState,
 };
 

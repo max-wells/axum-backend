@@ -9,7 +9,7 @@ use validator::Validate;
 use crate::{
     db::UserExt,
     domain::auth::dtos::dto_password::ResetPasswordRequestDto,
-    error::MyHttpError,
+    utils::my_errors::MyHttpError,
     utils::{my_response::MyResponse, password},
     AppState,
 };

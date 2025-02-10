@@ -11,10 +11,8 @@ use validator::Validate;
 
 use crate::{
     db::UserExt,
-    domain::mail::mails::send_welcome_email,
-    domain::users::dtos::dtos::VerifyEmailQueryDto,
-    error::{MyErrorMessage, MyHttpError},
-    utils::token,
+    domain::{auth::dtos::dto_verify_email_query::VerifyEmailQueryDto, mail::mails::send_welcome_email},
+    utils::{my_errors::{MyErrorMessage, MyHttpError}, token},
     AppState,
 };
 
