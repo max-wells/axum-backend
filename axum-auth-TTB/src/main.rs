@@ -3,6 +3,7 @@ use axum::http::{
     header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
     HeaderValue, Method,
 };
+use common::app_state::AppState;
 use dotenv::dotenv;
 use routes::create_router;
 use sqlx::postgres::PgPoolOptions;
@@ -19,11 +20,6 @@ mod common;
 use crate::common::config::Config;
 use crate::common::db::DBClient;
 
-#[derive(Debug, Clone)]
-pub struct AppState {
-    pub env: Config,
-    pub db_client: DBClient,
-}
 
 #[tokio::main]
 async fn main() {
