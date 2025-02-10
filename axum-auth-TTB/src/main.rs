@@ -5,8 +5,7 @@ mod error;
 mod db;
 mod utils;
 mod middleware;
-mod mail;
-mod handler;
+mod domain;
 mod routes;
 
 use std::sync::Arc;
