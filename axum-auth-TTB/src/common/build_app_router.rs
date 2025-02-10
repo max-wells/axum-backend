@@ -9,7 +9,7 @@ use crate::{
     AppState,
 };
 
-pub fn create_router(app_state: Arc<AppState>) -> Router {
+pub fn create_app_router(app_state: Arc<AppState>) -> Router {
     let api_route = Router::new()
         .nest("/auth", auth_services())
         .nest("/users", service_users().layer(middleware::from_fn(auth)))

@@ -5,18 +5,16 @@ use axum::http::{
 };
 use common::app_state::AppState;
 use dotenv::dotenv;
-use routes::create_router;
 use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::CorsLayer;
 use tracing_subscriber::filter::LevelFilter;
 
 mod domain;
-mod routes;
 mod utils;
 mod common;
 
 
-
+use crate::common::build_app_router::create_app_router;
 use crate::common::config::Config;
 use crate::common::db::DBClient;
 
@@ -56,16 +54,13 @@ async fn main() {
         db_client,
     };
 
-    let app = create_router(Arc::new(app_state.clone())).layer(cors.clone());
+    let app_router = create_app_router(Arc::new(app_state.clone())).layer(cors.clone());
 
-    println!(
-        "{}",
-        format!("🚀 Server is running on http://localhost:{}", config.port)
-    );
+    println!("🚀 Server running on Port {}", config.port);
 
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", &config.port))
         .await
         .unwrap();
 
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app_router).await.unwrap();
 }
