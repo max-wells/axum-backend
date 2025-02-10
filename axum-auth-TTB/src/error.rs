@@ -1,7 +1,7 @@
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json
+    Json,
 };
 use serde::{Deserialize, Serialize};
 use std::fmt;
@@ -50,7 +50,9 @@ impl ErrorMessage {
             ErrorMessage::EmptyPassword => "Password cannot be empty".to_string(),
             ErrorMessage::HashingError => "Error while hashing password".to_string(),
             ErrorMessage::InvalidHashFormat => "Invalid password hash format".to_string(),
-            ErrorMessage::ExceededMaxPasswordLength(max_length) => format!("Password must not be more than {} characters", max_length),
+            ErrorMessage::ExceededMaxPasswordLength(max_length) => {
+                format!("Password must not be more than {} characters", max_length)
+            }
             ErrorMessage::InvalidToken => "Authentication token is invalid or expired".to_string(),
             ErrorMessage::TokenNotProvided => "You are not logged in, please provide a token".to_string(),
             ErrorMessage::PermissionDenied => "You are not allowed to perform this action".to_string(),
@@ -59,7 +61,7 @@ impl ErrorMessage {
     }
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct HttpError {
     pub message: String,
     pub status: StatusCode,
@@ -88,9 +90,9 @@ impl HttpError {
     }
 
     pub fn unique_constraint_violation(message: impl Into<String>) -> Self {
-        HttpError { 
-            message: message.into(), 
-            status: StatusCode::CONFLICT 
+        HttpError {
+            message: message.into(),
+            status: StatusCode::CONFLICT,
         }
     }
 
@@ -113,11 +115,7 @@ impl HttpError {
 
 impl fmt::Display for HttpError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "HttpError: message: {}, status: {}",
-            self.message, self.status
-        )
+        write!(f, "HttpError: message: {}, status: {}", self.message, self.status)
     }
 }
 

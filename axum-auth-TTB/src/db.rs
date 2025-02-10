@@ -26,11 +26,7 @@ pub trait UserExt {
         token: Option<&str>,
     ) -> Result<Option<User>, sqlx::Error>;
 
-    async fn get_users(
-        &self,
-        page: u32,
-        limit: usize,
-    ) -> Result<Vec<User>, sqlx::Error>;
+    async fn get_users(&self, page: u32, limit: usize) -> Result<Vec<User>, sqlx::Error>;
 
     async fn save_user<T: Into<String> + Send>(
         &self,
@@ -43,35 +39,16 @@ pub trait UserExt {
 
     async fn get_user_count(&self) -> Result<i64, sqlx::Error>;
 
-    async fn update_user_name<T: Into<String> + Send>(
-        &self,
-        user_id: Uuid,
-        name: T,
-    ) -> Result<User, sqlx::Error>;
+    async fn update_user_name<T: Into<String> + Send>(&self, user_id: Uuid, name: T) -> Result<User, sqlx::Error>;
 
-    async fn update_user_role(
-        &self,
-        user_id: Uuid,
-        role: UserRole,
-    ) -> Result<User, sqlx::Error>;
+    async fn update_user_role(&self, user_id: Uuid, role: UserRole) -> Result<User, sqlx::Error>;
 
-    async fn update_user_password(
-        &self,
-        user_id: Uuid,
-        password: String,
-    ) -> Result<User, sqlx::Error>;
+    async fn update_user_password(&self, user_id: Uuid, password: String) -> Result<User, sqlx::Error>;
 
-    async fn verifed_token(
-        &self,
-        token: &str,
-    ) -> Result<(), sqlx::Error>;
+    async fn verifed_token(&self, token: &str) -> Result<(), sqlx::Error>;
 
-    async fn add_verifed_token(
-        &self,
-        user_id: Uuid,
-        token: &str,
-        expires_at: DateTime<Utc>,
-    ) -> Result<(), sqlx::Error>;
+    async fn add_verifed_token(&self, user_id: Uuid, token: &str, expires_at: DateTime<Utc>)
+        -> Result<(), sqlx::Error>;
 }
 
 #[async_trait]
@@ -119,11 +96,7 @@ impl UserExt for DBClient {
         Ok(user)
     }
 
-    async fn get_users(
-        &self,
-        page: u32,
-        limit: usize,
-    ) -> Result<Vec<User>, sqlx::Error> {
+    async fn get_users(&self, page: u32, limit: usize) -> Result<Vec<User>, sqlx::Error> {
         let offset = (page - 1) * limit as u32;
 
         let users = sqlx::query_as!(
@@ -164,20 +137,14 @@ impl UserExt for DBClient {
     }
 
     async fn get_user_count(&self) -> Result<i64, sqlx::Error> {
-        let count = sqlx::query_scalar!(
-            r#"SELECT COUNT(*) FROM users"#
-        )
-       .fetch_one(&self.pool)
-       .await?;
+        let count = sqlx::query_scalar!(r#"SELECT COUNT(*) FROM users"#)
+            .fetch_one(&self.pool)
+            .await?;
 
         Ok(count.unwrap_or(0))
     }
 
-    async fn update_user_name<T: Into<String> + Send>(
-        &self,
-        user_id: Uuid,
-        new_name: T
-    ) -> Result<User, sqlx::Error> {
+    async fn update_user_name<T: Into<String> + Send>(&self, user_id: Uuid, new_name: T) -> Result<User, sqlx::Error> {
         let user = sqlx::query_as!(
             User,
             r#"
@@ -194,11 +161,7 @@ impl UserExt for DBClient {
         Ok(user)
     }
 
-    async fn update_user_role(
-        &self,
-        user_id: Uuid,
-        new_role: UserRole
-    ) -> Result<User, sqlx::Error> {
+    async fn update_user_role(&self, user_id: Uuid, new_role: UserRole) -> Result<User, sqlx::Error> {
         let user = sqlx::query_as!(
             User,
             r#"
@@ -215,11 +178,7 @@ impl UserExt for DBClient {
         Ok(user)
     }
 
-    async fn update_user_password(
-        &self,
-        user_id: Uuid,
-        new_password: String
-    ) -> Result<User, sqlx::Error> {
+    async fn update_user_password(&self, user_id: Uuid, new_password: String) -> Result<User, sqlx::Error> {
         let user = sqlx::query_as!(
             User,
             r#"
@@ -236,11 +195,8 @@ impl UserExt for DBClient {
         Ok(user)
     }
 
-    async fn verifed_token(
-        &self,
-        token: &str,
-    ) -> Result<(), sqlx::Error> {
-        let _ =sqlx::query!(
+    async fn verifed_token(&self, token: &str) -> Result<(), sqlx::Error> {
+        let _ = sqlx::query!(
             r#"
             UPDATE users
             SET verified = true, 
@@ -250,8 +206,9 @@ impl UserExt for DBClient {
             WHERE verification_token = $1
             "#,
             token
-        ).execute(&self.pool)
-       .await;
+        )
+        .execute(&self.pool)
+        .await;
 
         Ok(())
     }
@@ -271,8 +228,9 @@ impl UserExt for DBClient {
             token,
             token_expires_at,
             user_id,
-        ).execute(&self.pool)
-       .await?;
+        )
+        .execute(&self.pool)
+        .await?;
 
         Ok(())
     }
