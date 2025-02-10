@@ -18,7 +18,7 @@ use crate::{
 };
 
 
-pub async fn update_user_password(
+pub async fn users_update_password(
     Extension(app_state): Extension<Arc<AppState>>,
     Extension(user): Extension<JWTAuthMiddeware>,
     Json(body): Json<UserPasswordUpdateDto>,

@@ -1,6 +1,6 @@
-pub mod get_me;
-pub mod get_users;
-pub mod service_users;
-pub mod update_user_name;
-pub mod update_user_password;
-pub mod update_user_role;
+pub mod services;
+pub mod users_get_all;
+pub mod users_get_me;
+pub mod users_update_name;
+pub mod users_update_password;
+pub mod users_update_role;

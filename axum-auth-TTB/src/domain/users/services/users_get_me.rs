@@ -20,7 +20,7 @@ use crate::{
 
 
 
-pub async fn get_me(
+pub async fn users_get_me(
     Extension(_app_state): Extension<Arc<AppState>>,
     Extension(user): Extension<JWTAuthMiddeware>,
 ) -> Result<impl IntoResponse, MyHttpError> {

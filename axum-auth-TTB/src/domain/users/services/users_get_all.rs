@@ -23,7 +23,7 @@ use crate::{
 
 
 
-pub async fn get_users(
+pub async fn users_get_all(
     Query(query_params): Query<RequestQueryDto>,
     Extension(app_state): Extension<Arc<AppState>>,
 ) -> Result<impl IntoResponse, MyHttpError> {

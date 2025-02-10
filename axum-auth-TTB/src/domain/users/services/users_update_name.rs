@@ -7,7 +7,9 @@ use validator::Validate;
 
 use crate::{
     db::UserExt,
-    dtos::{FilterUserDto, RoleUpdateDto, UserData, UserResponseDto},
+    dtos::{
+        FilterUserDto, NameUpdateDto, UserData,UserResponseDto,
+    },
     error::MyHttpError,
     middleware::JWTAuthMiddeware,
     AppState,
@@ -15,11 +17,10 @@ use crate::{
 
 
 
-
-pub async fn update_user_role(
+pub async fn users_update_name(
     Extension(app_state): Extension<Arc<AppState>>,
     Extension(user): Extension<JWTAuthMiddeware>,
-    Json(body): Json<RoleUpdateDto>,
+    Json(body): Json<NameUpdateDto>,
 ) -> Result<impl IntoResponse, MyHttpError> {
     body.validate().map_err(|e| MyHttpError::bad_request(e.to_string()))?;
 
@@ -29,7 +30,7 @@ pub async fn update_user_role(
 
     let result = app_state
         .db_client
-        .update_user_role(user_id.clone(), body.role)
+        .update_user_name(user_id.clone(), &body.name)
         .await
         .map_err(|e| MyHttpError::server_error(e.to_string()))?;
 

@@ -5,8 +5,8 @@ use axum::{
 };
 
 use super::{
-    get_me::get_me, get_users::get_users, update_user_name::update_user_name,
-    update_user_password::update_user_password, update_user_role::update_user_role,
+    users_get_all::users_get_all, users_get_me::users_get_me, users_update_name::users_update_name,
+    users_update_password::users_update_password, users_update_role::users_update_role,
 };
 use crate::{middleware::role_check, models::UserRole};
 
@@ -18,17 +18,17 @@ pub fn service_users() -> Router {
     Router::new()
         .route(
             "/me",
-            get(get_me).layer(middleware::from_fn(|state, req, next| {
+            get(users_get_me).layer(middleware::from_fn(|state, req, next| {
                 role_check(state, req, next, vec![UserRole::Admin, UserRole::User])
             })),
         )
         .route(
             "/users",
-            get(get_users).layer(middleware::from_fn(|state, req, next| {
+            get(users_get_all).layer(middleware::from_fn(|state, req, next| {
                 role_check(state, req, next, vec![UserRole::Admin])
             })),
         )
-        .route("/name", put(update_user_name))
-        .route("/role", put(update_user_role))
-        .route("/password", put(update_user_password))
+        .route("/name", put(users_update_name))
+        .route("/role", put(users_update_role))
+        .route("/password", put(users_update_password))
 }
