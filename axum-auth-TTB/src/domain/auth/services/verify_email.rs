@@ -12,7 +12,7 @@ use validator::Validate;
 use crate::{
     db::UserExt,
     domain::mail::mails::send_welcome_email,
-    dtos::VerifyEmailQueryDto,
+    domain::users::dtos::dtos::VerifyEmailQueryDto,
     error::{MyErrorMessage, MyHttpError},
     utils::token,
     AppState,

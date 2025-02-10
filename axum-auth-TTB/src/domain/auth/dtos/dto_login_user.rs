@@ -12,3 +12,10 @@ pub struct LoginUserDto {
     )]
     pub password: String,
 }
+
+//
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserLoginResponseDto {
+    pub status: String,
+    pub token: String,
+}

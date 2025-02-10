@@ -7,12 +7,7 @@ use axum::{
 use validator::Validate;
 
 use crate::{
-    db::UserExt,
-    dtos::{
-        FilterUserDto, RequestQueryDto, UserListResponseDto,
-    },
-    error:: MyHttpError,
-    AppState,
+    db::UserExt, domain::users::dtos::dtos::{FilterUserDto, RequestQueryDto, UserListResponseDto}, error:: MyHttpError, AppState
 };
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/

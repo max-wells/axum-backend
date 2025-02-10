@@ -7,7 +7,7 @@ use validator::Validate;
 
 use crate::{
     db::UserExt,
-    dtos::{FilterUserDto, RoleUpdateDto, UserData, UserResponseDto},
+    domain::users::dtos::dtos::{FilterUserDto, RoleUpdateDto, UserData, UserResponseDto},
     error::MyHttpError,
     middleware::JWTAuthMiddeware,
     AppState,

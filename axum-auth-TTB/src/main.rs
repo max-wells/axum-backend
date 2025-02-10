@@ -1,7 +1,6 @@
 mod config;
 mod db;
 mod domain;
-mod dtos;
 mod error;
 mod middleware;
 mod models;
