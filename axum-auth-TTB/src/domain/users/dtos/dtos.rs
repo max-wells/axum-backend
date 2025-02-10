@@ -5,13 +5,6 @@ use validator::Validate;
 
 use crate::models::{User, UserRole};
 
-// TODO. Export it from elsewhere
-#[derive(Serialize, Deserialize)]
-pub struct MyResponse {
-    pub status: &'static str,
-    pub message: String,
-}
-
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                     ✨ FUNCTIONS ✨                        */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
@@ -22,14 +15,6 @@ pub struct MyResponse {
 pub struct VerifyEmailQueryDto {
     #[validate(length(min = 1, message = "Token is required."))]
     pub token: String,
-}
-
-#[derive(Serialize, Deserialize, Validate)]
-pub struct RequestQueryDto {
-    #[validate(range(min = 1))]
-    pub page: Option<usize>,
-    #[validate(range(min = 1, max = 50))]
-    pub limit: Option<usize>,
 }
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/

@@ -10,8 +10,8 @@ use crate::{
     db::UserExt,
     domain::{ mail::mails::{send_forgot_password_email}},
     domain::auth::dtos::dto_password::ForgotPasswordRequestDto,
-    domain::users::dtos::dtos::MyResponse,
     error::{ MyHttpError},
+    utils::my_response::MyResponse,
     AppState,
 };
 

@@ -7,10 +7,10 @@ use validator::Validate;
 
 use crate::{
     db::UserExt,
-    domain::users::dtos::dtos::{UserPasswordUpdateDto, MyResponse},
+    domain::users::dtos::dtos::{UserPasswordUpdateDto},
     error::{MyErrorMessage, MyHttpError},
     middleware::{JWTAuthMiddeware},
-    utils::password,
+    utils::{my_response::MyResponse, password},
     AppState,
 };
 
