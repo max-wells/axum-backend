@@ -15,7 +15,7 @@ use crate::{
         FilterUserDto, NameUpdateDto, RequestQueryDto, MyResponse, RoleUpdateDto, UserData, UserListResponseDto,
         UserPasswordUpdateDto, UserResponseDto,
     },
-    error::{ErrorMessage, HttpError},
+    error::{MyErrorMessage, MyHttpError},
     middleware::{role_check, JWTAuthMiddeware},
     models::UserRole,
     utils::password,
@@ -44,7 +44,7 @@ pub fn users_handler() -> Router {
 pub async fn get_me(
     Extension(_app_state): Extension<Arc<AppState>>,
     Extension(user): Extension<JWTAuthMiddeware>,
-) -> Result<impl IntoResponse, HttpError> {
+) -> Result<impl IntoResponse, MyHttpError> {
     let filtered_user = FilterUserDto::filter_user(&user.user);
 
     let response_data = UserResponseDto {
@@ -58,10 +58,10 @@ pub async fn get_me(
 pub async fn get_users(
     Query(query_params): Query<RequestQueryDto>,
     Extension(app_state): Extension<Arc<AppState>>,
-) -> Result<impl IntoResponse, HttpError> {
+) -> Result<impl IntoResponse, MyHttpError> {
     query_params
         .validate()
-        .map_err(|e| HttpError::bad_request(e.to_string()))?;
+        .map_err(|e| MyHttpError::bad_request(e.to_string()))?;
 
     let page = query_params.page.unwrap_or(1);
     let limit = query_params.limit.unwrap_or(10);
@@ -70,13 +70,13 @@ pub async fn get_users(
         .db_client
         .get_users(page as u32, limit)
         .await
-        .map_err(|e| HttpError::server_error(e.to_string()))?;
+        .map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     let user_count = app_state
         .db_client
         .get_user_count()
         .await
-        .map_err(|e| HttpError::server_error(e.to_string()))?;
+        .map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     let response = UserListResponseDto {
         status: "success".to_string(),
@@ -91,8 +91,8 @@ pub async fn update_user_name(
     Extension(app_state): Extension<Arc<AppState>>,
     Extension(user): Extension<JWTAuthMiddeware>,
     Json(body): Json<NameUpdateDto>,
-) -> Result<impl IntoResponse, HttpError> {
-    body.validate().map_err(|e| HttpError::bad_request(e.to_string()))?;
+) -> Result<impl IntoResponse, MyHttpError> {
+    body.validate().map_err(|e| MyHttpError::bad_request(e.to_string()))?;
 
     let user = &user.user;
 
@@ -102,7 +102,7 @@ pub async fn update_user_name(
         .db_client
         .update_user_name(user_id.clone(), &body.name)
         .await
-        .map_err(|e| HttpError::server_error(e.to_string()))?;
+        .map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     let filtered_user = FilterUserDto::filter_user(&result);
 
@@ -118,8 +118,8 @@ pub async fn update_user_role(
     Extension(app_state): Extension<Arc<AppState>>,
     Extension(user): Extension<JWTAuthMiddeware>,
     Json(body): Json<RoleUpdateDto>,
-) -> Result<impl IntoResponse, HttpError> {
-    body.validate().map_err(|e| HttpError::bad_request(e.to_string()))?;
+) -> Result<impl IntoResponse, MyHttpError> {
+    body.validate().map_err(|e| MyHttpError::bad_request(e.to_string()))?;
 
     let user = &user.user;
 
@@ -129,7 +129,7 @@ pub async fn update_user_role(
         .db_client
         .update_user_role(user_id.clone(), body.role)
         .await
-        .map_err(|e| HttpError::server_error(e.to_string()))?;
+        .map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     let filtered_user = FilterUserDto::filter_user(&result);
 
@@ -145,8 +145,8 @@ pub async fn update_user_password(
     Extension(app_state): Extension<Arc<AppState>>,
     Extension(user): Extension<JWTAuthMiddeware>,
     Json(body): Json<UserPasswordUpdateDto>,
-) -> Result<impl IntoResponse, HttpError> {
-    body.validate().map_err(|e| HttpError::bad_request(e.to_string()))?;
+) -> Result<impl IntoResponse, MyHttpError> {
+    body.validate().map_err(|e| MyHttpError::bad_request(e.to_string()))?;
 
     let user = &user.user;
 
@@ -156,24 +156,24 @@ pub async fn update_user_password(
         .db_client
         .get_user(Some(user_id.clone()), None, None, None)
         .await
-        .map_err(|e| HttpError::server_error(e.to_string()))?;
+        .map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
-    let user = result.ok_or(HttpError::unauthorized(ErrorMessage::InvalidToken.to_string()))?;
+    let user = result.ok_or(MyHttpError::unauthorized(MyErrorMessage::InvalidToken.to_string()))?;
 
     let password_match =
-        password::compare(&body.old_password, &user.password).map_err(|e| HttpError::server_error(e.to_string()))?;
+        password::compare(&body.old_password, &user.password).map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     if !password_match {
-        return Err(HttpError::bad_request("Old password is incorrect".to_string()));
+        return Err(MyHttpError::bad_request("Old password is incorrect".to_string()));
     }
 
-    let hash_password = password::hash(&body.new_password).map_err(|e| HttpError::server_error(e.to_string()))?;
+    let hash_password = password::hash(&body.new_password).map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     app_state
         .db_client
         .update_user_password(user_id.clone(), hash_password)
         .await
-        .map_err(|e| HttpError::server_error(e.to_string()))?;
+        .map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
     let response = MyResponse {
         message: "Password updated Successfully".to_string(),

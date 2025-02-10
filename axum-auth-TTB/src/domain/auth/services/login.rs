@@ -1,6 +1,6 @@
 use axum::{
     http::{header, HeaderMap},
-    response::{IntoResponse},
+    response::IntoResponse,
     Extension, Json,
 };
 use axum_extra::extract::cookie::Cookie;
@@ -9,11 +9,9 @@ use validator::Validate;
 
 use crate::{
     db::UserExt,
-    domain::{
-        auth::dto::{LoginUserDto},
-    },
-    dtos::{UserLoginResponseDto},
-    error::{ErrorMessage, HttpError},
+    domain::auth::dtos::dto_login_user::LoginUserDto,
+    dtos::UserLoginResponseDto,
+    error::{MyErrorMessage, MyHttpError},
     utils::{password, token},
     AppState,
 };
@@ -21,19 +19,19 @@ use crate::{
 pub async fn login(
     Extension(app_state): Extension<Arc<AppState>>,
     Json(body): Json<LoginUserDto>,
-) -> Result<impl IntoResponse, HttpError> {
-    body.validate().map_err(|e| HttpError::bad_request(e.to_string()))?;
+) -> Result<impl IntoResponse, MyHttpError> {
+    body.validate().map_err(|e| MyHttpError::bad_request(e.to_string()))?;
 
     let result = app_state
         .db_client
         .get_user(None, None, Some(&body.email), None)
         .await
-        .map_err(|e| HttpError::server_error(e.to_string()))?;
+        .map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
-    let user = result.ok_or(HttpError::bad_request(ErrorMessage::WrongCredentials.to_string()))?;
+    let user = result.ok_or(MyHttpError::bad_request(MyErrorMessage::WrongCredentials.to_string()))?;
 
     let password_matched = password::compare(&body.password, &user.password)
-        .map_err(|_| HttpError::bad_request(ErrorMessage::WrongCredentials.to_string()))?;
+        .map_err(|_| MyHttpError::bad_request(MyErrorMessage::WrongCredentials.to_string()))?;
 
     if password_matched {
         let token = token::create_token(
@@ -41,7 +39,7 @@ pub async fn login(
             &app_state.env.jwt_secret.as_bytes(),
             app_state.env.jwt_maxage,
         )
-        .map_err(|e| HttpError::server_error(e.to_string()))?;
+        .map_err(|e| MyHttpError::server_error(e.to_string()))?;
 
         let cookie_duration = time::Duration::minutes(app_state.env.jwt_maxage * 60);
         let cookie = Cookie::build(("token", token.clone()))
@@ -64,6 +62,6 @@ pub async fn login(
 
         Ok(response)
     } else {
-        Err(HttpError::bad_request(ErrorMessage::WrongCredentials.to_string()))
+        Err(MyHttpError::bad_request(MyErrorMessage::WrongCredentials.to_string()))
     }
 }
