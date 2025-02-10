@@ -6,13 +6,12 @@ use chrono::{Duration, Utc};
 use std::sync::Arc;
 use validator::Validate;
 
-use crate::{
-    common::db::UserExt,
-    domain::{ mail::mails::{send_forgot_password_email}},
-    domain::auth::dtos::dto_password::ForgotPasswordRequestDto,
-    utils::{my_errors::MyHttpError, my_response::MyResponse},
-    AppState,
-};
+use crate::common::app_state::AppState;
+use crate::common::db::UserExt;
+use crate::domain::auth::dtos::dto_password::ForgotPasswordRequestDto;
+use crate::domain::mail::mails::send_forgot_password_email;
+use crate::utils::my_errors::MyHttpError;
+use crate::utils::my_response::MyResponse;
 
 
 
