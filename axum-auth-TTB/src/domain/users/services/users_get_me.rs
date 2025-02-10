@@ -6,7 +6,7 @@ use axum::{
 
 use crate::{
     common::middleware::JWTAuthMiddeware,
-    domain::users::dtos::dtos::{FilterUserDto, UserData, UserResponseDto},
+    domain::users::dtos::{dto_user_responses::{UserData, UserResponseDto}, dto_filter_user::FilterUserDto},
     utils::my_errors::MyHttpError,
     AppState,
 };
