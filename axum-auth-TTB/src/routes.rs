@@ -4,8 +4,8 @@ use axum::{middleware, Extension, Router};
 use tower_http::trace::TraceLayer;
 
 use crate::{
+    common::middleware::auth,
     domain::{auth::services::auth_services::auth_services, users::services::services::service_users},
-    middleware::auth,
     AppState,
 };
 

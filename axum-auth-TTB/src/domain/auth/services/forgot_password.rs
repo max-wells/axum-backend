@@ -7,7 +7,7 @@ use std::sync::Arc;
 use validator::Validate;
 
 use crate::{
-    db::UserExt,
+    common::db::UserExt,
     domain::{ mail::mails::{send_forgot_password_email}},
     domain::auth::dtos::dto_password::ForgotPasswordRequestDto,
     utils::{my_errors::MyHttpError, my_response::MyResponse},

@@ -8,7 +8,7 @@ use std::sync::Arc;
 use validator::Validate;
 
 use crate::{
-    db::UserExt,
+    common::db::UserExt,
     domain::auth::dtos::dto_login_user::LoginUserDto,
     domain::auth::dtos::dto_login_user::UserLoginResponseDto,
     utils::{my_errors::{MyErrorMessage, MyHttpError}, utils_password, utils_token},

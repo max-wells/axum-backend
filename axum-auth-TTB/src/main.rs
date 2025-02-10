@@ -1,23 +1,23 @@
-mod config;
-mod db;
-mod domain;
-mod middleware;
-mod routes;
-mod utils;
-
 use std::sync::Arc;
-
 use axum::http::{
     header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
     HeaderValue, Method,
 };
-use config::Config;
-use db::DBClient;
 use dotenv::dotenv;
 use routes::create_router;
 use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::CorsLayer;
 use tracing_subscriber::filter::LevelFilter;
+
+mod domain;
+mod routes;
+mod utils;
+mod common;
+
+
+
+use crate::common::config::Config;
+use crate::common::db::DBClient;
 
 #[derive(Debug, Clone)]
 pub struct AppState {

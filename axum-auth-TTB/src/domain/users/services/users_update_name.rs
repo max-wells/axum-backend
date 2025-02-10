@@ -6,10 +6,9 @@ use axum::{
 use validator::Validate;
 
 use crate::{
-    db::UserExt,
+    common::{db::UserExt, middleware::JWTAuthMiddeware},
     domain::users::dtos::dtos::{FilterUserDto, NameUpdateDto, UserData,UserResponseDto},
     utils::my_errors::MyHttpError,
-    middleware::JWTAuthMiddeware,
     AppState,
 };
 
