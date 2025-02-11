@@ -6,17 +6,11 @@ use chrono::Utc;
 use std::sync::Arc;
 use validator::Validate;
 
-use crate::{
-    common::db::UserExt,
-    domain::auth::dtos::dto_password::ResetPasswordRequestDto,
-    utils::my_errors::MyHttpError,
-    utils::{my_response::MyResponse, utils_password},
-    AppState,
-};
-
-
-
-
+use crate::common::db::UserExt;
+use crate::domain::auth::dtos::dto_password::ResetPasswordRequestDto;
+use crate::utils::my_errors::MyHttpError;
+use crate::utils::{my_response::MyResponse, utils_password};
+use crate::common::app_state::AppState;
 
 pub async fn reset_password(
     Extension(app_state): Extension<Arc<AppState>>,

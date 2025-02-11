@@ -3,10 +3,11 @@ use axum::{
     Router,
 };
 
-use super::{
-    forgot_password::forgot_password, login::login, register::register, reset_password::reset_password,
-    verify_email::verify_email,
-};
+use crate::domain::auth::services::forgot_password::forgot_password;
+use crate::domain::auth::services::login::login;
+use crate::domain::auth::services::register::register;
+use crate::domain::auth::services::reset_password::reset_password;
+use crate::domain::auth::services::verify_email::verify_email;
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */

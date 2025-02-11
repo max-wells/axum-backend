@@ -7,13 +7,11 @@ use axum_extra::extract::cookie::Cookie;
 use std::sync::Arc;
 use validator::Validate;
 
-use crate::{
-    common::db::UserExt,
-    domain::auth::dtos::dto_login_user::LoginUserDto,
-    domain::auth::dtos::dto_login_user::UserLoginResponseDto,
-    utils::{my_errors::{MyErrorMessage, MyHttpError}, utils_password, utils_token},
-    AppState,
-};
+use crate::common::db::UserExt;
+use crate::domain::auth::dtos::dto_login_user::LoginUserDto;
+use crate::domain::auth::dtos::dto_login_user::UserLoginResponseDto;
+use crate::utils::{my_errors::{MyErrorMessage, MyHttpError}, utils_password, utils_token};
+use crate::common::app_state::AppState;
 
 pub async fn login(
     Extension(app_state): Extension<Arc<AppState>>,

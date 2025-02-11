@@ -9,14 +9,11 @@ use chrono::Utc;
 use std::sync::Arc;
 use validator::Validate;
 
-use crate::{
-    common::db::UserExt,
-    domain::{auth::dtos::dto_verify_email_query::VerifyEmailQueryDto, mail::mails::send_welcome_email},
-    utils::{my_errors::{MyErrorMessage, MyHttpError}, utils_token},
-    AppState,
-};
-
-
+use crate::common::db::UserExt;
+use crate::domain::auth::dtos::dto_verify_email_query::VerifyEmailQueryDto;
+use crate::domain::mail::mails::send_welcome_email;
+use crate::utils::{my_errors::{MyErrorMessage, MyHttpError}, utils_token};
+use crate::common::app_state::AppState;
 
 pub async fn verify_email(
     Query(query_params): Query<VerifyEmailQueryDto>,

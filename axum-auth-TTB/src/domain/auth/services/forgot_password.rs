@@ -13,9 +13,6 @@ use crate::domain::mail::mails::send_forgot_password_email;
 use crate::utils::my_errors::MyHttpError;
 use crate::utils::my_response::MyResponse;
 
-
-
-
 pub async fn forgot_password(
     Extension(app_state): Extension<Arc<AppState>>,
     Json(body): Json<ForgotPasswordRequestDto>,

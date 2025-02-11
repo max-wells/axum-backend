@@ -7,13 +7,11 @@ use chrono::{Duration, Utc};
 use std::sync::Arc;
 use validator::Validate;
 
-use crate::{
-    common::db::UserExt,
-    domain::{ auth::dtos::dto_register_user::RegisterUserDto, mail::mails::send_verification_email},
-    utils::{my_errors::{MyErrorMessage, MyHttpError}, my_response::MyResponse, utils_password},
-    AppState,
-};
-
+use crate::common::db::UserExt;
+use crate::domain::auth::dtos::dto_register_user::RegisterUserDto;
+use crate::domain::mail::mails::send_verification_email;
+use crate::utils::{my_errors::{MyErrorMessage, MyHttpError}, my_response::MyResponse, utils_password};
+use crate::common::app_state::AppState;
 
 pub async fn register(
     Extension(app_state): Extension<Arc<AppState>>,
