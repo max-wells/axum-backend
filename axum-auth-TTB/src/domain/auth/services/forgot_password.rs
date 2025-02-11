@@ -1,7 +1,4 @@
-use axum::{
-    response::IntoResponse,
-    Extension, Json,
-};
+use axum::{response::IntoResponse, Extension, Json};
 use chrono::{Duration, Utc};
 use std::sync::Arc;
 use validator::Validate;

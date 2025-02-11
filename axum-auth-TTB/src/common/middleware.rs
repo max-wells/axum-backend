@@ -14,7 +14,10 @@ use serde::{Deserialize, Serialize};
 use crate::{
     common::db::UserExt,
     domain::users::models::models_user::{User, UserRole},
-    utils::{my_errors::{MyErrorMessage, MyHttpError}, utils_token},
+    utils::{
+        my_errors::{MyErrorMessage, MyHttpError},
+        utils_token,
+    },
     AppState,
 };
 

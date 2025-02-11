@@ -1,17 +1,17 @@
-use axum::{
-    http::StatusCode,
-    response::IntoResponse,
-    Extension, Json,
-};
+use axum::{http::StatusCode, response::IntoResponse, Extension, Json};
 use chrono::{Duration, Utc};
 use std::sync::Arc;
 use validator::Validate;
 
+use crate::common::app_state::AppState;
 use crate::common::db::UserExt;
 use crate::domain::auth::dtos::dto_register_user::RegisterUserDto;
 use crate::domain::mail::mails::send_verification_email;
-use crate::utils::{my_errors::{MyErrorMessage, MyHttpError}, my_response::MyResponse, utils_password};
-use crate::common::app_state::AppState;
+use crate::utils::{
+    my_errors::{MyErrorMessage, MyHttpError},
+    my_response::MyResponse,
+    utils_password,
+};
 
 pub async fn register(
     Extension(app_state): Extension<Arc<AppState>>,

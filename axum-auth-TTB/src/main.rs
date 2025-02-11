@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use axum::http::{
     header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
     HeaderValue, Method,
@@ -6,18 +5,17 @@ use axum::http::{
 use common::app_state::AppState;
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
+use std::sync::Arc;
 use tower_http::cors::CorsLayer;
 use tracing_subscriber::filter::LevelFilter;
 
+mod common;
 mod domain;
 mod utils;
-mod common;
-
 
 use crate::common::build_app_router::create_app_router;
 use crate::common::config::Config;
 use crate::common::db::DBClient;
-
 
 #[tokio::main]
 async fn main() {

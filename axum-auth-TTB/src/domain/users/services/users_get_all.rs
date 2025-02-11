@@ -1,22 +1,17 @@
+use axum::{extract::Query, response::IntoResponse, Extension, Json};
 use std::sync::Arc;
-use axum::{
-    extract::Query,
-    response::IntoResponse,
-    Extension, Json,
-};
 use validator::Validate;
 
 use crate::{
-    common::db::UserExt, domain::users::dtos::{dto_user_responses::UserListResponseDto, dto_filter_user::FilterUserDto}, utils::{my_errors::MyHttpError, request_query_dto::RequestQueryDto}, AppState
+    common::db::UserExt,
+    domain::users::dtos::{dto_filter_user::FilterUserDto, dto_user_responses::UserListResponseDto},
+    utils::{my_errors::MyHttpError, request_query_dto::RequestQueryDto},
+    AppState,
 };
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                     ✨ FUNCTIONS ✨                        */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
-
-
-
-
 
 pub async fn users_get_all(
     Query(query_params): Query<RequestQueryDto>,

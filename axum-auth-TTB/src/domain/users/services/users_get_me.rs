@@ -1,24 +1,19 @@
+use axum::{response::IntoResponse, Extension, Json};
 use std::sync::Arc;
-use axum::{
-    response::IntoResponse,
-    Extension, Json,
-};
 
 use crate::{
     common::middleware::JWTAuthMiddeware,
-    domain::users::dtos::{dto_user_responses::{UserData, UserResponseDto}, dto_filter_user::FilterUserDto},
+    domain::users::dtos::{
+        dto_filter_user::FilterUserDto,
+        dto_user_responses::{UserData, UserResponseDto},
+    },
     utils::my_errors::MyHttpError,
     AppState,
 };
 
-
-
-
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                     ✨ FUNCTIONS ✨                        */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
-
-
 
 pub async fn users_get_me(
     Extension(_app_state): Extension<Arc<AppState>>,

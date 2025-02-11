@@ -1,15 +1,17 @@
+use axum::{response::IntoResponse, Extension, Json};
 use std::sync::Arc;
-use axum::{
-    response::IntoResponse,
-    Extension, Json,
-};
 use validator::Validate;
 
 use crate::{
-    common::{db::UserExt, middleware::JWTAuthMiddeware}, domain::users::dtos::{dto_filter_user::FilterUserDto, dto_user_responses::{UserData, UserResponseDto}, dto_update_name::NameUpdateDto}, utils::my_errors::MyHttpError, AppState
+    common::{db::UserExt, middleware::JWTAuthMiddeware},
+    domain::users::dtos::{
+        dto_filter_user::FilterUserDto,
+        dto_update_name::NameUpdateDto,
+        dto_user_responses::{UserData, UserResponseDto},
+    },
+    utils::my_errors::MyHttpError,
+    AppState,
 };
-
-
 
 pub async fn users_update_name(
     Extension(app_state): Extension<Arc<AppState>>,
