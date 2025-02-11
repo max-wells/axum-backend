@@ -17,6 +17,8 @@ const URL_USERS: &str = "https://jsonplaceholder.typicode.com/users";
 const KEY_USER_NAMES: &str = "user_names";
 const VEC_NAMES: [&str; 4] = ["John", "Jane", "Jim", "Jill"];
 
+const EXPIRE_TIME_SEC: usize = 10;
+
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
@@ -66,8 +68,13 @@ async fn rpush_and_lrange_user_names(
         println!("Added user name: {}", name);
     }
 
+    let _: () = connection.expire(KEY_USER_NAMES, EXPIRE_TIME_SEC)?;
+
     let names: Vec<String> = connection.lrange(KEY_USER_NAMES, 0, -1)?;
     println!("User names: {:?}", names);
+
+    // * [Terminal] 🖥️ --> LRANGE user_names 0 -1
+    // * └──> Should expire in 10 seconds
 
     Ok(())
 }
