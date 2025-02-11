@@ -15,6 +15,7 @@ const URL_REDIS: &str = "redis://127.0.0.1/";
 const URL_USERS: &str = "https://jsonplaceholder.typicode.com/users";
 
 const KEY_USER_NAMES: &str = "user_names";
+const KEY_USER_IDS: &str = "user_ids";
 const VEC_NAMES: [&str; 4] = ["John", "Jane", "Jim", "Jill"];
 
 const EXPIRE_TIME_SEC: usize = 10;
@@ -28,9 +29,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = redis::Client::open(URL_REDIS)?;
     let mut connection = client.get_connection()?;
 
-    let _ = store_user_with_id_1(&mut connection).await;
+    // let _ = store_user_with_id_1(&mut connection).await;
 
-    let _ = rpush_and_lrange_user_names(VEC_NAMES, &mut connection).await;
+    // let _ = rpush_and_lrange_user_names(VEC_NAMES, &mut connection).await;
+
+    let _ = hashset_user_ids_and_names(&mut connection).await;
 
 
     Ok(())
@@ -75,6 +78,35 @@ async fn rpush_and_lrange_user_names(
 
     // * [Terminal] 🖥️ --> LRANGE user_names 0 -1
     // * └──> Should expire in 10 seconds
+
+    Ok(())
+}
+
+
+
+/*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+/*                     ✨ FUNCTIONS ✨                        */
+/*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+
+
+async fn hashset_user_ids_and_names(
+    connection: &mut redis::Connection,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let user_id = 1;
+    let user_name = "John";
+
+    let _: () = connection.hset(format!("user:{}", user_id), "name", user_name)?;
+
+    let _: () = connection.sadd(KEY_USER_IDS, user_id)?;
+    let _: () = connection.sadd(KEY_USER_NAMES, user_name)?;
+    println!("User ID and name added to hashset");
+
+    let user_ids: Vec<String> = connection.smembers(KEY_USER_IDS)?;
+    let user_names: Vec<String> = connection.smembers(KEY_USER_NAMES)?;
+
+    println!("User IDs: {:?}", user_ids);
+    println!("User Names: {:?}", user_names);
 
     Ok(())
 }
