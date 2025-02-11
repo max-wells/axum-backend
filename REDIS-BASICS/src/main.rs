@@ -14,38 +14,36 @@ struct User {
 const URL_REDIS: &str = "redis://127.0.0.1/";
 const URL_USERS: &str = "https://jsonplaceholder.typicode.com/users";
 
+const KEY_USER_NAMES: &str = "user_names";
+const VEC_NAMES: [&str; 4] = ["John", "Jane", "Jim", "Jill"];
+
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                        🦀 MAIN 🦀                          */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // let _ = store_user_with_id_1().await;
+    let client = redis::Client::open(URL_REDIS)?;
+    let mut connection = client.get_connection()?;
 
-    let names = vec!["John", "Jane", "Jim", "Jill"];
-    let _ = add_user_names(names).await;
+    let _ = store_user_with_id_1(&mut connection).await;
 
-    let names = get_user_names().await?;
-    println!("User names: {:?}", names);
+    let _ = rpush_and_lrange_user_names(VEC_NAMES, &mut connection).await;
+
 
     Ok(())
 }
-
-
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
 /*                     ✨ FUNCTIONS ✨                        */
 /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-async fn store_user_with_id_1() -> Result<(), Box<dyn std::error::Error>> {
+async fn store_user_with_id_1(
+    connection: &mut redis::Connection,
+) -> Result<(), Box<dyn std::error::Error>> {
     let user_id = 1;
     let url = format!("{}/{}", URL_USERS, user_id);
     let user: User = reqwest::get(&url).await?.json().await?;
-
-    // Connect to Redis
-    let client = redis::Client::open(URL_REDIS)?;
-    let mut connection = client.get_connection()?;
 
     // Store user data in Redis
     let _: () = connection.hset(format!("user:{}", user.id), "name", user.name)?;
@@ -58,29 +56,19 @@ async fn store_user_with_id_1() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-
-
-async fn add_user_names(names: Vec<&str>) -> Result<(), Box<dyn std::error::Error>> {
-    // Connect to Redis
-    let client = redis::Client::open(URL_REDIS)?;
-    let mut connection = client.get_connection()?;
-
+async fn rpush_and_lrange_user_names(
+    names: [&str; 4],
+    connection: &mut redis::Connection,
+) -> Result<(), Box<dyn std::error::Error>> {
     // Add multiple user names to the list
     for name in names {
-        let _: () = connection.rpush("user_names", name)?;
+        let _: () = connection.rpush(KEY_USER_NAMES, name)?;
         println!("Added user name: {}", name);
     }
+
+    let names: Vec<String> = connection.lrange(KEY_USER_NAMES, 0, -1)?;
+    println!("User names: {:?}", names);
 
     Ok(())
 }
 
-
-async fn get_user_names() -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    // Connect to Redis
-    let client = redis::Client::open(URL_REDIS)?;
-    let mut connection = client.get_connection()?;
-
-    // Retrieve all user names from the list
-    let names: Vec<String> = connection.lrange("user_names", 0, -1)?;
-    Ok(names)
-}
