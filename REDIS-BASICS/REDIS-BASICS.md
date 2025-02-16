@@ -28,6 +28,4 @@ HGET person name # --> max
 HSET person age 20
 HGET person age # --> 20
 
-
-
 ```
